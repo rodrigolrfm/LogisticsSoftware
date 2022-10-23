@@ -1,0 +1,60 @@
+.ant-layout-content {
+    padding: 50px 40px;
+    background: #fff
+}
+.ant-menu-submenu-selected {
+    color: #BF0909;
+}
+.ant-layout {
+    background: #fff;
+}
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+    background-color: #ffe6e6;
+}
+.ant-menu-item-selected a {
+    color: #BF0909;
+}
+.ant-menu-item a:hover {
+    color: #d83030;
+}
+.ant-menu-submenu:hover > .ant-menu-submenu-title > .ant-menu-submenu-arrow {
+    color: #d83030;
+}
+.ant-menu-item-selected a, .ant-menu-item-selected a:hover {
+    color: #d83030;
+}
+.ant-menu-item-selected {
+    color: #BF0909;
+}
+.ant-menu-light .ant-menu-item:hover {
+    color: #BF0909;
+}
+.ant-menu-light .ant-menu-item-active {
+    color: #BF0909;
+}
+.ant-menu-light .ant-menu-item:hover, .ant-menu-light .ant-menu-item-active, .ant-menu-light .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open, .ant-menu-light .ant-menu-submenu-active, .ant-menu-light .ant-menu-submenu-title:hover {
+    color: #d95353;
+}
+.ant-menu-inline .ant-menu-item::after {
+    border-right: 3px solid #BF0909;
+}
+.ant-menu-light .ant-menu-submenu-title:hover {
+    color: #BF0909;
+}
+.ant-card {
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 10%)
+}
+.ant-layout-header {
+    background: #fff;
+    height: 80px;
+    padding: 10px 40px;
+}
+.ant-btn-primary {
+    background: #BF0909;
+    border-color: #BF0909;
+}
+.ant-btn-primary:hover, .ant-btn-primary:focus {
+    color: #fff;
+    border-color: #BF0909;
+    background: #ce3434;
+}
