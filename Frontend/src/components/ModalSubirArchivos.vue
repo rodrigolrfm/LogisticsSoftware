@@ -56,7 +56,7 @@ export default {
 
         console.log(file);
         this.file=file;
-        /*var reader=new FileReader();
+        var reader=new FileReader();
         var fileByteArray=[];
         reader.readAsArrayBuffer(file);
         reader.onloadend=function(evt){
@@ -67,9 +67,10 @@ export default {
               fileByteArray.push(array[i]);
             }
             console.log(fileByteArray);
+            this.file = fileByteArray
           }
         }
-        console.log(reader.result);*/
+        console.log(reader.result);
         return this.$message.success(`${file.name} subido correctamente.`);
       }
 
@@ -90,7 +91,7 @@ export default {
     },
     analizar(){
 
-      this.$emit('clickAnalizar',file);
+      this.$emit('clickAnalizar',this.file);
     },
   }
 }

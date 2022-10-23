@@ -59,11 +59,17 @@
         this.modalVisible=false;
       },
       async clickAnalizar(file){
-        let data=await getSugerencia(file);
-        console.log(data);
-        this.nombreArchivo=file.name;
-        this.mensaje=data.Sugerencia;
-        this.modalVisible=false;
+        console.log(file);
+        try {
+          let data=await getSugerencia(file);
+          console.log(data);
+          this.nombreArchivo=file.name;
+          this.mensaje=data.Sugerencia;
+          this.modalVisible=false;
+        } catch (error) {
+          console.log(error);
+          this.modalVisible=false;
+        }
       }
     }
   }
