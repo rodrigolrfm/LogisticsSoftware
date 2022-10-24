@@ -226,6 +226,10 @@ async def create_upload_file(file: UploadFile | None = None):
         print(dataset.columns)
         loc = Nominatim(user_agent="GetLoc") 
         departamento = dataset.loc[0,"DEPARTAMENTO"]
+        distrito = dataset.loc[0,"DISTRITO"]
+        provincia = dataset.loc[0,"PROVINCIA"]
+        cliente = dataset.loc[0,"CLIENTE"]
+        proveedor = dataset.loc[0,"PROVEEDOR DE TRANSPORTE"]
         print(departamento)
         getLoc = loc.geocode(departamento) 
         longitud =  getLoc.longitude
@@ -450,12 +454,6 @@ async def create_upload_file(file: UploadFile | None = None):
         
         model = XGBClassifier()
         
-        #f = open('D:\\CICLO12\\MachineLearning\\model_sklearn.json',"r")
-        #with open("D:\\CICLO12\\MachineLearning\\model_sklearn.json") as archivo:
-        #    datos = json.load(archivo)
-        #data = json.loads(f.read())
-        
-        #model.load_model(data)
         model.load_model('D:\\CICLO12\\MachineLearning\\model_sklearn.json')
         print(model)
         print("Luego del model")
@@ -463,16 +461,31 @@ async def create_upload_file(file: UploadFile | None = None):
         y_pred = model.predict(dataset)
         predictions = [round(value) for value in y_pred]
         
-        claves = list(dictionarySugerencias.keys())
-        valores = list(dictionarySugerencias.values())
-
+        valPrediction = predictions[0]
         sugerenciaPred = list(dictionarySugerencias.keys())[list(dictionarySugerencias.values()).index(predictions[0])]
-        # Closing file
-        #f.close()
-        #out = dataset.to_json(orient='records')[1:-1].replace('},{', '} {')
+        if (valPrediction==3):
+            stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(cliente),str(distrito),str(provincia),str(departamento),sugerenciaPred)
+        elif (valPrediction==0):
+            stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {}".format(str(cliente),sugerenciaPred)
+        elif (valPrediction==1):
+            stringResponse = "{} PARA COMPLEMENTAR LAS SOLICITUDES EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
+        elif (valPrediction==4):
+            stringResponse = "JUSTICIAR INCUMPLIMIENTO. PARA LAS PRÓXIMAS SOLICITUDES SE SUGIERE COORDINAR CON EL DESTINATARIO 'X' POR LA MODIFICACIÓN DE SU DIRECCIÓN"
+        elif (valPrediction==2):
+            #climas
+            stringResponse = "{} EN EL DISTRITO DE {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} POR LOS PROBLEMAS CLIMÁTICOS O SOCIALES".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
+        elif (valPrediction==5):
+            stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}"
+        elif (valPrediction==6):
+            # Incidencia del proveedor
+            stringResponse = sugerenciaPred + " " + proveedor
+        elif (valPrediction==7):
+            # Caso OK
+            stringResponse = sugerenciaPred
+        
         file.file.close()
         
-        return {"Sugerencia": sugerenciaPred}
+        return {"Sugerencia": stringResponse}
     
 
 """
