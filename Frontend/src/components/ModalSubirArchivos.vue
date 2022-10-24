@@ -8,20 +8,18 @@
   >
     <a-row>
       <div class="upload-container">
-        
-          <a-upload-dragger
-              name="file"
-              class="upload"
-              :multiple="true"
-              :before-upload="beforeUpload"
-              
-              @change="handleChange"
-          >
-            <div class="ant-upload-drag-container">
-              <p class="upload-text">Arrastre su archivo aquí o de click para seleccionarlo.</p>
-            </div>
-          </a-upload-dragger>
-          
+        <a-upload-dragger
+            name="file"
+            class="upload"
+            :multiple="true"
+            :before-upload="beforeUpload"
+            action="http://localhost:8000/general/uploadfile/"
+            @change="handleChange"
+        >
+          <div class="ant-upload-drag-container">
+            <p class="upload-text">Arrastre su archivo aquí o de click para seleccionarlo.</p>
+          </div>
+        </a-upload-dragger>
       </div>
     </a-row>
   </a-modal>
@@ -56,9 +54,14 @@ export default {
 
         console.log(file);
         this.file=file;
-        var reader=new FileReader();
+        setTimeout(()=>{
+          console.log(file);
+        },6000)
+        /*var reader=new FileReader();
         var fileByteArray=[];
-        reader.readAsArrayBuffer(file);
+        var blobFile=new Blob([file],{type:'text/csv'})
+        console.log(blobFile);
+        reader.readAsArrayBuffer(blobFile);
         reader.onloadend=function(evt){
           if(evt.target.readyState==FileReader.DONE){
             var arrayBuffer=evt.target.result;
@@ -67,10 +70,9 @@ export default {
               fileByteArray.push(array[i]);
             }
             console.log(fileByteArray);
-            this.file = fileByteArray
           }
         }
-        console.log(reader.result);
+        console.log(reader.result);*/
         return this.$message.success(`${file.name} subido correctamente.`);
       }
 
@@ -81,6 +83,7 @@ export default {
     beforeUpload(file) {
       const isLt1GB = file.size / 1024 < 1048;
       console.log(file.size);
+      console.log(file);
       if (!isLt1GB) {
         this.$message.error('Sólo puedes subir archivos menores a 1GB!');
       }
@@ -90,7 +93,6 @@ export default {
       this.$emit('clickCancelar');
     },
     analizar(){
-
       this.$emit('clickAnalizar',this.file);
     },
   }

@@ -17,6 +17,7 @@
           solo
           :value="mensaje"
           disabled
+          rows="10"
         ></a-textarea>
       </a-col>
       <a-col>
@@ -36,7 +37,6 @@
 
 <script>
   import { HomeOutlined } from '@ant-design/icons-vue';
-  import {getSugerencia} from '../services/index'
   import ModalSubirArchivos from '../components/ModalSubirArchivos.vue'
   
   export default {
@@ -58,18 +58,11 @@
       clickCancelar(){
         this.modalVisible=false;
       },
-      async clickAnalizar(file){
+      clickAnalizar(file){
         console.log(file);
-        try {
-          let data=await getSugerencia(file);
-          console.log(data);
-          this.nombreArchivo=file.name;
-          this.mensaje=data.Sugerencia;
-          this.modalVisible=false;
-        } catch (error) {
-          console.log(error);
-          this.modalVisible=false;
-        }
+        this.nombreArchivo=file.name;
+        this.mensaje=file.response.Sugerencia;
+        this.modalVisible=false;
       }
     }
   }
