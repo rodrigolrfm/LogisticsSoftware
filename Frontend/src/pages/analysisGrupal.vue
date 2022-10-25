@@ -7,7 +7,7 @@
             class="upload"
             :multiple="true"
             :before-upload="beforeUpload"
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            action="http://localhost:8000/general/uploadfileGrupal/"
             @change="handleChange"
         >
           <div class="ant-upload-drag-container">
@@ -16,11 +16,8 @@
         </a-upload-dragger>
         <template #actions>
           <a-row justify="center">
-            <a-col :span="4">
-              <a-button style="color:#82868B">Cancelar</a-button>
-            </a-col>
             <a-col>
-              <a-button type="primary" >Realizar Análisis</a-button>
+              <a-button type="primary" @click="realizarAnalisis">Realizar Análisis</a-button>
             </a-col>
           </a-row>
         </template>
@@ -32,12 +29,19 @@
 
 <script>
 import { HomeOutlined } from '@ant-design/icons-vue';
+import {Workbook} from 'exceljs';
+import * as fs from 'file-saver';
 
 export default {
   components: {
     HomeOutlined,
   },
   name: "index",
+  data(){
+    return{
+      file:[],
+    }
+  },
   methods: {
     handleChange({file}) {
       console.log(file);
@@ -47,27 +51,54 @@ export default {
 
       if (status === 'done') {
         this.uploaded = true;
+
         console.log(file);
-        /*var reader=new FileReader();
-        var fileByteArray=[];
-        reader.readAsArrayBuffer(file);
-        reader.onloadend=function(evt){
-          if(evt.target.readyState==FileReader.DONE){
-            var arrayBuffer=evt.target.result;
-            var array=new Uint8Array(arrayBuffer);
-            for(var i=0;i<array.length;i++){
-              fileByteArray.push(array[i]);
-            }
-            console.log(fileByteArray);
-          }
-        }
-        console.log(reader.result);*/
+        this.file=file;
+        setTimeout(()=>{
+          console.log(file);
+        },2000);
         return this.$message.success(`${file.name} subido correctamente.`);
       }
-
       if (status === 'error') {
         return this.$message.error(`${file.name} ha fallado al subir.`);
       }
+    },
+    realizarAnalisis(){
+      console.log(this.file);
+      this.descargarReporte(this.file.response.Sugerencia);
+    },
+    descargarReporte(contenido1){
+      console.log(contenido1);
+      let contenido=JSON.parse(contenido1);
+      console.log(contenido); 
+      let workbook=new Workbook();
+      let worksheet=workbook.addWorksheet("Sugerencias");
+
+      worksheet.addRow(contenido.columns);
+      for(let i=1;i<53;i++){
+        worksheet.getCell(1,i).fill={
+          type:'pattern',
+          pattern:'solid',
+          fgColor:{argb:'B2FFFF'},
+        };
+        worksheet.getCell(1,i).border={
+          top: {style:'thin'},
+          left: {style:'thin'},
+          bottom: {style:'thin'},
+          right: {style:'thin'}
+        };
+      }
+
+      for(let i=0;i<contenido.data.length;i++){
+        worksheet.addRow(contenido.data[i]);
+      }
+
+      workbook.xlsx.writeBuffer().then((data)=>{
+        let blob=new Blob([data],{
+          type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        fs.saveAs(blob,"Reporte.xlsx");
+      });
     },
     beforeUpload(file) {
       const isLt1GB = file.size / 1024 < 1048;

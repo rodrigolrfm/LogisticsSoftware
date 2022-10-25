@@ -488,6 +488,299 @@ async def create_upload_file(file: UploadFile | None = None):
         return {"Sugerencia": stringResponse}
     
 
+@router.post("/uploadfileGrupal/")
+async def create_upload_file(file: UploadFile | None = None):
+    if not file:
+        return {"message": "No upload file sent"}
+    else:
+        dataset = pd.read_csv(file.file,sep=";")
+        
+        # Se crean agregan los parámetros de la longitud y longitud de los departamentos
+        dataset["Latitud"]=0
+        dataset["Longitud"]=0
+        print(type(dataset))
+        print(dataset.columns)
+        
+        for i in range(len(dataset)):
+            loc = Nominatim(user_agent="GetLoc") 
+            departamento = dataset.loc[i,"DEPARTAMENTO"]
+            distrito = dataset.loc[i,"DISTRITO"]
+            provincia = dataset.loc[i,"PROVINCIA"]
+            cliente = dataset.loc[i,"CLIENTE"]
+            proveedor = dataset.loc[i,"PROVEEDOR DE TRANSPORTE"]
+            print(departamento)
+            getLoc = loc.geocode(departamento) 
+            longitud =  getLoc.longitude
+            latitud = getLoc.latitude
+            dataset.loc[i,"Latitud"] = latitud
+            dataset.loc[i,"Longitud"] = longitud
+        
+        dataset["TEMPERATURA"]=0
+        dataset["HUMEDAD"]=0
+        dataset["CLIMA"]= ""
+        
+        for i in dataset.index:
+            fechaReparto = dataset.loc[i,"FECHA REPARTO"]
+            my_ts = fechaReparto.split("/")
+            dt = datetime.datetime(int(my_ts[2]), int(my_ts[1]), int(my_ts[0]))
+            timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
+            dateInit = str(timestamp+64800)
+            dateInitUnix = dateInit[0:len(dateInit)-2]
+            url = "http://history.openweathermap.org/data/2.5/history/city?lat={}&lon={}&type=hour&start={}&end={}&appid=b9c3fde5b6c1179bccc0b366a4d04fd0&units=metric".format(str(dataset.loc[0,"Latitud"]),str(dataset.loc[0,"Longitud"]),dateInitUnix,dateInitUnix)
+            res = requests.get(url)
+            data = res.json()
+            temperatura = data["list"][0]["main"]["temp"]
+            humedad = data["list"][0]["main"]["humidity"]
+            clima = data["list"][0]["weather"][0]["main"]
+            dataset.loc[i,"TEMPERATURA"] = temperatura
+            dataset.loc[i,"HUMEDAD"] = humedad
+            dataset.loc[i,"CLIMA"] = clima
+        
+        
+        response = requests.get('http://datacrim.inei.gob.pe/csv_controller/index?desde=tematico&id=40001')
+        df = pd.read_csv(io.StringIO(response.text), sep=',', header=None, quoting=csv.QUOTE_ALL)
+        df[0] = df[0].astype('string')
+        df[1] = df[1].astype('string')
+        df[2] = df[2].astype('string')
+        dataCrime = df.loc[(df[0]=="2021") & (df[1]!="NACIONAL")]
+        val = list(dataCrime.loc[dataCrime[1]=="DEPARTAMENTO DE LIMA 2/"][2])[0]
+        dataCrime.drop(dataCrime.loc[dataCrime[1]=="DEPARTAMENTO DE LIMA 2/"].index, inplace=True)
+        dataCrime[2] = dataCrime[2].astype('float')
+        indiceLima = int(dataCrime.loc[dataCrime[1]=="LIMA METROPOLITANA 1/"].index[0])
+        indiceCallao = int(dataCrime.loc[dataCrime[1]=="PROVINCIA CONSTITUCIONAL DEL CALLAO"].index[0])
+        dataCrime.loc[indiceCallao,1] = "LIMA"
+        dataCrime.loc[indiceLima,1] = "LIMA"
+        
+        
+        print("impresión de datacrime")
+        print(dataCrime.columns)
+        
+        url = 'https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=262432%2C262433%2C262429%2C420794%2C262428%2C420795&tipo_ubigeo=1&desde_anio=2020&hasta_anio=2020&ubigeo_listado=&idioma=ES'
+        dataProblemaGeografico = list()
+        dataProblemaGeograficoRequest = requests.get(url)
+        dataProblemaGeografico = dataProblemaGeograficoRequest.json()
+        
+        url2 = "https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=516860&tipo_ubigeo=1&desde_anio=2017&hasta_anio=2017&ubigeo_listado=&idioma=ES"
+        dataProblemaAdultoMayor = list()
+        dataProblemaAdultoMayorRequest = requests.get(url2)
+        dataProblemaAdultoMayor = dataProblemaAdultoMayorRequest.json()
+        
+        url3 = "https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=394842&tipo_ubigeo=1&desde_anio=2021&hasta_anio=2021&ubigeo_listado=&idioma=ES"
+        dataAccidentesTransito = list()
+        dataAccidentesTransitoRequest = requests.get(url3)
+        dataAccidentesTransito = dataAccidentesTransitoRequest.json()
+        
+        listaDepartamentos = list()
+        for i in dataProblemaGeografico:
+            if (i["departamento"] not in listaDepartamentos):
+                listaDepartamentos.append(i["departamento"])
+                
+        # Calculo de datos de problemas naturales
+        listaProblemasGeograficoDatos = [0]*25
+        for i in dataProblemaGeografico:
+            if (i["departamento"] in listaDepartamentos):
+                index = listaDepartamentos.index(i["departamento"])
+                listaProblemasGeograficoDatos[index] = int(listaProblemasGeograficoDatos[index]) + int(i["dato"].replace(" ",""))
+        
+        # Calculo de datos de adultos mayores
+        listaDatosAdultosMayores = [0]*25
+        for i in dataProblemaAdultoMayor:
+            if (i["departamento"] in listaDepartamentos):
+                index = listaDepartamentos.index(i["departamento"])
+                listaDatosAdultosMayores[index] = int(listaDatosAdultosMayores[index]) + int(i["dato"].replace(" ",""))
+        
+        # Calculo de datos de accidentes de transito
+        listaDatosAccTransito = [0]*25
+        for i in dataAccidentesTransito:
+            if (i["departamento"] in listaDepartamentos):
+                index = listaDepartamentos.index(i["departamento"])
+                listaDatosAccTransito[index] = int(listaDatosAccTransito[index]) + int(i["dato"].replace(" ",""))
+        
+        listaDepartamentos = list(map(lambda x : normalize(x), listaDepartamentos))
+        
+        dataCrime.rename(columns = {0:'AÑO', 1:'DEPARTAMENTO',2:'INDICE_DELITOS'}, inplace = True)
+        
+        dataCrime["CANT_FENO_NAT"]=0
+        dataCrime["CANT_ADULTOMAYOR"]=0
+        dataCrime["CANT_ACC_TRANSITO"]=0
+        
+        for i in dataCrime.index:
+            departamento = str(dataCrime.loc[i,"DEPARTAMENTO"])
+            if (departamento in listaDepartamentos):
+                index_departamento = listaDepartamentos.index(departamento)
+                val_prob_geo = listaProblemasGeograficoDatos[index_departamento]
+                val_cant_adul_mayor = listaDatosAdultosMayores[index_departamento]
+                val_cant_acc_transito = listaDatosAccTransito[index_departamento]
+                dataCrime.loc[i,"CANT_FENO_NAT"] = val_prob_geo
+                dataCrime.loc[i,"CANT_ADULTOMAYOR"] = val_cant_adul_mayor
+                dataCrime.loc[i,"CANT_ACC_TRANSITO"] = val_cant_acc_transito
+        
+        # Se crea nuevo dataframe
+        newDataSet = pd.merge(dataset, dataCrime, how='inner', on = 'DEPARTAMENTO')
+        
+        # Se reemplza por el anterior
+        dataset = newDataSet.copy()
+        
+        dataset["DIRECCION1"] = dataset["DIRECCION1"].str.upper()
+        dataset["TIENE_AV"] = dataset.DIRECCION1.str.contains("AV|AVENIDA",regex=True,case=False)
+        dataset["TIENE_JR"] = dataset.DIRECCION1.str.contains("JR|JIRON",regex=True,case=False)
+        dataset["TIENE_CALLE"] = dataset.DIRECCION1.str.contains("CALLE",regex=True,case=False)
+        
+        dataset = dataset.drop(dataset[dataset.TIPO_INCIDENCIA_REPARTO == "COORDINADO"].index)
+        dataset = dataset.drop(dataset[dataset.TIPO_INCIDENCIA_REPARTO == "REPROGRAMACION"].index)
+        dataset = dataset.drop(dataset[dataset.TIPO_INCIDENCIA_REPARTO == "REEMBARQUE ENTREGA EN AGENCIA"].index)
+        dataset = dataset.drop(dataset[dataset.TIPO_INCIDENCIA_REPARTO == "DESCONOCIDO/NO DA RAZÓN"].index)
+        dataset = dataset.drop(dataset[dataset.TIPO_INCIDENCIA_REPARTO == "RECOJO EN OFICINA"].index)
+        dataset = dataset.drop(dataset[dataset.TIPO_INCIDENCIA_REPARTO == "RECHAZADO"].index)
+        dataset = dataset.drop(dataset[dataset.TIPO_INCIDENCIA_REPARTO == "DESPACHO ERRADO"].index)
+        dataset["TIPO_INCIDENCIA_REPARTO"] = np.where(dataset["TIPO_INCIDENCIA_REPARTO"].isna(), 'OK', dataset["TIPO_INCIDENCIA_REPARTO"])
+        dataset = dataset.drop(dataset[dataset.ESTADO_MANIFIESTO == "RECOGIDO"].index)
+        dataset = dataset.drop(dataset[dataset.ESTADO_MANIFIESTO == "PENDIENTE"].index)
+        dataset = dataset.drop(dataset[dataset.ESTADO_MANIFIESTO == "INFORMADO"].index)
+        dataset = dataset.drop(dataset[dataset.ESTADO_MANIFIESTO == "DDV"].index)
+        dataset = dataset.drop(dataset[dataset.DEPARTAMENTO.isnull()].index)
+        
+        dataset = dataset.drop(['GUIA'], axis=1)
+        dataset = dataset.drop(['AÑO'], axis=1)
+        dataset = dataset.drop(['DIRECCION1'], axis=1)
+        dataset = dataset.drop(['N_MANIFIESTO'], axis=1)
+        dataset = dataset.drop(['PROVINCIA'], axis=1)
+        dataset = dataset.drop(['DISTRITO'], axis=1)
+        dataset = dataset.drop(['NUMERO REPARTO'], axis=1)
+        dataset = dataset.drop(['FECHA MANIFIESTO_VERIFICADO'], axis=1)
+        dataset = dataset.drop(['ORIGEN_BASE'], axis=1)
+        dataset = dataset.drop(['REMITENTE'], axis=1)
+        dataset = dataset.drop(['FECHA_EMBARQUE'], axis=1)
+        dataset = dataset.drop(['FORMA_CONF_ENTREGA'], axis=1)
+        dataset = dataset.drop(['CONSIGNATARIO'], axis=1)
+        dataset = dataset.drop(['DESTINO_BASE'], axis=1)
+        dataset = dataset.drop(['REPRESENTANTE'], axis=1)
+        dataset = dataset.drop(['DIRECCION2'], axis=1)
+        dataset = dataset.drop(['FECHA_LLEGADA_PROYECT'], axis=1)
+        dataset = dataset.drop(['FECHA_LLEGADA_REAL'], axis=1)
+        dataset = dataset.drop(['FECHA MANIFIESTO_RECOGIDO'], axis=1)
+        dataset = dataset.drop(['FECHA MANIFIESTO_INFORMADO'], axis=1)
+        dataset = dataset.drop(['FECHA REPARTO'], axis=1)
+        dataset = dataset.drop(['DESTINO'], axis=1)
+        dataset = dataset.drop(['FECHA_COMPROMISO'], axis=1)
+        dataset = dataset.drop(['FECHA_MANIFIESTO'], axis=1)
+        dataset = dataset.drop(['RESP_REPARTO'], axis=1)
+        dataset = dataset.drop(['FECHA_INCIDENCIA_REPARTO'], axis=1)
+        dataset = dataset.drop(['FECHA_SALIDA_PROYECT'], axis=1)
+        dataset = dataset.drop(['FECHA_GUIA'], axis=1)
+        dataset = dataset.drop(['FECHA_ENTREGA'], axis=1)
+        dataset = dataset.drop(['ORIGEN'], axis=1)
+        dataset = dataset.drop(['GESTORA_SERVICIO'], axis=1)
+        dataset = dataset.drop(['PROVEEDOR DE TRANSPORTE'], axis=1)
+        dataset = dataset.drop(['CLIENTE'], axis=1)
+        #dataset = dataset.drop(['count'], axis=1)
+        dataset = dataset.drop(['ESTADO_MANIFIESTO'], axis=1)
+        dataset = dataset.drop(['ESTADO_GUIA'], axis=1)
+        dataset = dataset.drop(['TIPO_INCIDENCIA_REPARTO'], axis=1)
+        
+        moda = dataset['VIA'].mode()[0]
+        dataset['VIA'] = dataset['VIA'].fillna(moda)
+
+        moda = dataset['SERVICIO'].mode()[0]
+        dataset['SERVICIO'] = dataset['SERVICIO'].fillna(moda)
+
+        moda = dataset['DEPARTAMENTO'].mode()[0]
+        dataset['DEPARTAMENTO'] = dataset['DEPARTAMENTO'].fillna(moda)
+
+        dataset['TIENE_AV'] = np.where(dataset['TIENE_AV']==True, 1, dataset['TIENE_AV'])
+        dataset['TIENE_AV'] = np.where(dataset['TIENE_AV']==False, 0, dataset['TIENE_AV'])
+        dataset['TIENE_AV'] = np.where(dataset['TIENE_AV'].isna()==True, 0, dataset['TIENE_AV'])
+        dataset['TIENE_JR'] = np.where(dataset['TIENE_JR']==True, 1, dataset['TIENE_JR'])
+        dataset['TIENE_JR'] = np.where(dataset['TIENE_JR']==False, 0, dataset['TIENE_JR'])
+        dataset['TIENE_JR'] = np.where(dataset['TIENE_JR'].isna()==True, 0, dataset['TIENE_JR'])
+        dataset['TIENE_CALLE'] = np.where(dataset['TIENE_CALLE']==True, 1, dataset['TIENE_CALLE'])
+        dataset['TIENE_CALLE'] = np.where(dataset['TIENE_CALLE']==False, 0, dataset['TIENE_CALLE'])
+        dataset['TIENE_CALLE'] = np.where(dataset['TIENE_CALLE'].isna()==True, 0, dataset['TIENE_CALLE'])
+        dataset['INCIDENCIA_MANIFIESTO'] = np.where(dataset['INCIDENCIA_MANIFIESTO'].isnull()==True, 'OK', dataset['INCIDENCIA_MANIFIESTO'])
+        
+        dataset['NO_TIENE_REF'] = 0
+        dataset['NO_TIENE_REF'] = np.where((dataset['TIENE_AV']==0) & (dataset['TIENE_JR']==0) & (dataset['TIENE_CALLE']==0), 1, dataset['NO_TIENE_REF'])
+        dataset["TIENE_AV"] = dataset["TIENE_AV"].astype('int')
+        dataset["TIENE_JR"] =dataset["TIENE_JR"].astype('int')
+        dataset["TIENE_CALLE"] =dataset["TIENE_CALLE"].astype('int')
+        dataset["NO_TIENE_REF"] = dataset["NO_TIENE_REF"].astype('int')
+        
+        for i in dataset.index:
+            departamento = str(dataset.loc[i,"DEPARTAMENTO"])
+            servicio = str(dataset.loc[i,"SERVICIO"])
+            via = str(dataset.loc[i,"VIA"])
+            incidenciaMan = str(dataset.loc[i,"INCIDENCIA_MANIFIESTO"])
+            #tipoIncidencia = str(dataset.loc[i,"TIPO_INCIDENCIA_REPARTO"])
+            clima = str(dataset.loc[i,"CLIMA"])
+
+            val_departamento = dictionaryDepartamentos[departamento]
+            val_servicio = dictionaryServicios[servicio]
+            val_via = dictionaryVias[via]
+            val_incidenciaMan = dictionaryIncidenciaMan[incidenciaMan]
+            #val_tipoIncidencia = dictionaryTipoIncidencia[tipoIncidencia]
+            val_clima = dictionaryClimas[clima]
+
+            dataset.loc[i,"SERVICIO"] = val_servicio
+            dataset.loc[i,"DEPARTAMENTO"] = val_departamento
+            dataset.loc[i,"VIA"] = val_via
+            dataset.loc[i,"INCIDENCIA_MANIFIESTO"] = val_incidenciaMan
+            #dataset.loc[i,"TIPO_INCIDENCIA_REPARTO"] = val_tipoIncidencia
+            dataset.loc[i,"CLIMA"] = val_clima
+        
+        dataset["SERVICIO"] = dataset["SERVICIO"].astype('int')
+        dataset["DEPARTAMENTO"] =dataset["DEPARTAMENTO"].astype('int')
+        dataset["VIA"] =dataset["VIA"].astype('int')
+        dataset["INCIDENCIA_MANIFIESTO"] = dataset["INCIDENCIA_MANIFIESTO"].astype('int')
+        #dataset["TIPO_INCIDENCIA_REPARTO"] =dataset["TIPO_INCIDENCIA_REPARTO"].astype('int')
+        dataset["CLIMA"] = dataset["CLIMA"].astype('int')
+        
+        model = XGBClassifier()
+        
+        model.load_model('D:\\CICLO12\\MachineLearning\\model_sklearn.json')
+        print(model)
+        print("Luego del model")
+        print(dataset.columns)
+        y_pred = model.predict(dataset)
+        predictions = [round(value) for value in y_pred]
+        
+        # Se crea json de respuesta:
+        dataResponse = newDataSet.copy()
+        
+        dataResponse["SUGERENCIAS_STR"] = ""       
+        
+        j = 0
+        for i in dataResponse.index:
+            valPrediction = predictions[j]
+            sugerenciaPred = list(dictionarySugerencias.keys())[list(dictionarySugerencias.values()).index(predictions[j])]
+            if (valPrediction==3):
+                stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(cliente),str(distrito),str(provincia),str(departamento),sugerenciaPred)
+            elif (valPrediction==0):
+                stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {}".format(str(cliente),sugerenciaPred)
+            elif (valPrediction==1):
+                stringResponse = "{} PARA COMPLEMENTAR LAS SOLICITUDES EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
+            elif (valPrediction==4):
+                stringResponse = "JUSTICIAR INCUMPLIMIENTO. PARA LAS PRÓXIMAS SOLICITUDES SE SUGIERE COORDINAR CON EL DESTINATARIO 'X' POR LA MODIFICACIÓN DE SU DIRECCIÓN"
+            elif (valPrediction==2):
+                #climas
+                stringResponse = "{} EN EL DISTRITO DE {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} POR LOS PROBLEMAS CLIMÁTICOS O SOCIALES".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
+            elif (valPrediction==5):
+                stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}"
+            elif (valPrediction==6):
+                # Incidencia del proveedor
+                stringResponse = sugerenciaPred + " " + proveedor
+            elif (valPrediction==7):
+                # Caso OK
+                stringResponse = sugerenciaPred
+            j=j+1
+            dataResponse.loc[i,"SUGERENCIAS_STR"] = stringResponse
+        
+        responseJson = dataResponse.to_json(orient='split')
+        print(responseJson)
+        file.file.close()
+        
+        return {"Sugerencia": responseJson}
+
+
 """
 def getIndicesCriminalidad():
     response = requests.get('http://datacrim.inei.gob.pe/csv_controller/index?desde=tematico&id=40001')
