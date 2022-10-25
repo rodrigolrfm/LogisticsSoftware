@@ -229,6 +229,7 @@ async def create_upload_file(file: UploadFile | None = None):
         distrito = dataset.loc[0,"DISTRITO"]
         provincia = dataset.loc[0,"PROVINCIA"]
         cliente = dataset.loc[0,"CLIENTE"]
+        incidente = dataset.loc[0,"TIPO_INCIDENCIA_REPARTO"]
         proveedor = dataset.loc[0,"PROVEEDOR DE TRANSPORTE"]
         print(departamento)
         getLoc = loc.geocode(departamento) 
@@ -454,7 +455,7 @@ async def create_upload_file(file: UploadFile | None = None):
         
         model = XGBClassifier()
         
-        model.load_model('D:\\CICLO12\\MachineLearning\\model_sklearn.json')
+        model.load_model('D:\\CICLO12\\Tesis2\\TesisSoftware\\LogisticsSoftware\\Algortimos\\PesoModeloActual\\modelov4.json')
         print(model)
         print("Luego del model")
         print(dataset.columns)
@@ -466,7 +467,7 @@ async def create_upload_file(file: UploadFile | None = None):
         if (valPrediction==3):
             stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(cliente),str(distrito),str(provincia),str(departamento),sugerenciaPred)
         elif (valPrediction==0):
-            stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {}".format(str(cliente),sugerenciaPred)
+            stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {} YA QUE EL INCIDENTE OBSEVADO SE DEBE A {}".format(str(cliente),sugerenciaPred,str(incidente))
         elif (valPrediction==1):
             stringResponse = "{} PARA COMPLEMENTAR LAS SOLICITUDES EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
         elif (valPrediction==4):
@@ -475,7 +476,7 @@ async def create_upload_file(file: UploadFile | None = None):
             #climas
             stringResponse = "{} EN EL DISTRITO DE {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} POR LOS PROBLEMAS CLIMÁTICOS O SOCIALES".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
         elif (valPrediction==5):
-            stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}"
+            stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
         elif (valPrediction==6):
             # Incidencia del proveedor
             stringResponse = sugerenciaPred + " " + proveedor
@@ -501,15 +502,23 @@ async def create_upload_file(file: UploadFile | None = None):
         print(type(dataset))
         print(dataset.columns)
         
+        departamentosnew = []
+        provincias = []
+        distritos = []
+        clientes = []
+        proveedores = []        
+        incidencias = []
+        
         for i in range(len(dataset)):
             loc = Nominatim(user_agent="GetLoc") 
-            departamento = dataset.loc[i,"DEPARTAMENTO"]
-            distrito = dataset.loc[i,"DISTRITO"]
-            provincia = dataset.loc[i,"PROVINCIA"]
-            cliente = dataset.loc[i,"CLIENTE"]
-            proveedor = dataset.loc[i,"PROVEEDOR DE TRANSPORTE"]
-            print(departamento)
-            getLoc = loc.geocode(departamento) 
+            departamentosnew.append(dataset.loc[i,"DEPARTAMENTO"])
+            distritos.append(dataset.loc[i,"DISTRITO"])
+            provincias.append(dataset.loc[i,"PROVINCIA"])
+            clientes.append(dataset.loc[i,"CLIENTE"])
+            proveedores.append(dataset.loc[i,"PROVEEDOR DE TRANSPORTE"])
+            incidencias.append(dataset.loc[i,"TIPO_INCIDENCIA_REPARTO"])
+            #print(departamento)
+            getLoc = loc.geocode(str(dataset.loc[i,"DEPARTAMENTO"])) 
             longitud =  getLoc.longitude
             latitud = getLoc.latitude
             dataset.loc[i,"Latitud"] = latitud
@@ -736,7 +745,7 @@ async def create_upload_file(file: UploadFile | None = None):
         
         model = XGBClassifier()
         
-        model.load_model('D:\\CICLO12\\MachineLearning\\model_sklearn.json')
+        model.load_model('D:\\CICLO12\\Tesis2\\TesisSoftware\\LogisticsSoftware\\Algortimos\\PesoModeloActual\\modelov4.json')
         print(model)
         print("Luego del model")
         print(dataset.columns)
@@ -745,29 +754,34 @@ async def create_upload_file(file: UploadFile | None = None):
         
         # Se crea json de respuesta:
         dataResponse = newDataSet.copy()
-        
-        dataResponse["SUGERENCIAS_STR"] = ""       
+        #departamentosnew = []
+        #provincias = []
+        #distritos = []
+        #clientes = []
+        #proveedores = []        
+        #incidencias = []
+        #dataResponse["SUGERENCIAS_STR"] = ""       
         
         j = 0
         for i in dataResponse.index:
             valPrediction = predictions[j]
             sugerenciaPred = list(dictionarySugerencias.keys())[list(dictionarySugerencias.values()).index(predictions[j])]
             if (valPrediction==3):
-                stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(cliente),str(distrito),str(provincia),str(departamento),sugerenciaPred)
+                stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(clientes[j]),str(distritos[j]),str(provincias[j]),str(departamentosnew[j]),sugerenciaPred)
             elif (valPrediction==0):
-                stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {}".format(str(cliente),sugerenciaPred)
+                stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {} YA QUE EL INCIDENTE OBSEVADO SE DEBE A {}".format(str(clientes[j]),sugerenciaPred,str(incidencias[j]))
             elif (valPrediction==1):
-                stringResponse = "{} PARA COMPLEMENTAR LAS SOLICITUDES EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
+                stringResponse = "{} PARA COMPLEMENTAR LAS SOLICITUDES EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distritos[j]),str(provincias[j]),str(departamentosnew[j]))
             elif (valPrediction==4):
                 stringResponse = "JUSTICIAR INCUMPLIMIENTO. PARA LAS PRÓXIMAS SOLICITUDES SE SUGIERE COORDINAR CON EL DESTINATARIO 'X' POR LA MODIFICACIÓN DE SU DIRECCIÓN"
             elif (valPrediction==2):
                 #climas
-                stringResponse = "{} EN EL DISTRITO DE {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} POR LOS PROBLEMAS CLIMÁTICOS O SOCIALES".format(sugerenciaPred,str(distrito),str(provincia),str(departamento))
+                stringResponse = "{} EN EL DISTRITO DE {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} POR LOS PROBLEMAS CLIMÁTICOS O SOCIALES".format(sugerenciaPred,str(distritos[j]),str(provincias[j]),str(departamentosnew[j]))
             elif (valPrediction==5):
-                stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}"
+                stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distritos[j]),str(provincias[j]),str(departamentosnew[j]))
             elif (valPrediction==6):
                 # Incidencia del proveedor
-                stringResponse = sugerenciaPred + " " + proveedor
+                stringResponse = sugerenciaPred + " " + str(proveedores[j])
             elif (valPrediction==7):
                 # Caso OK
                 stringResponse = sugerenciaPred
@@ -779,57 +793,3 @@ async def create_upload_file(file: UploadFile | None = None):
         file.file.close()
         
         return {"Sugerencia": responseJson}
-
-
-"""
-def getIndicesCriminalidad():
-    response = requests.get('http://datacrim.inei.gob.pe/csv_controller/index?desde=tematico&id=40001')
-    df = pd.read_csv(io.StringIO(response.text), sep=',', header=None, quoting=csv.QUOTE_ALL)
-    df[0] = df[0].astype('string')
-    df[1] = df[1].astype('string')
-    df[2] = df[2].astype('string')
-    dataCrime = df.loc[(df[0]=="2021") & (df[1]!="NACIONAL")]
-    val = list(dataCrime.loc[dataCrime[1]=="DEPARTAMENTO DE LIMA 2/"][2])[0]
-    dataCrime.drop(dataCrime.loc[dataCrime[1]=="DEPARTAMENTO DE LIMA 2/"].index, inplace=True)
-    dataCrime[2] = dataCrime[2].astype('float')
-    indiceLima = int(dataCrime.loc[dataCrime[1]=="LIMA METROPOLITANA 1/"].index[0])
-    indiceCallao = int(dataCrime.loc[dataCrime[1]=="PROVINCIA CONSTITUCIONAL DEL CALLAO"].index[0])
-    dataCrime.loc[indiceCallao,1] = "LIMA"
-    dataCrime.loc[indiceLima,1] = "LIMA"
-
-def getProblemasNaturales():
-    url = 'https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=262432%2C262433%2C262429%2C420794%2C262428%2C420795&tipo_ubigeo=1&desde_anio=2020&hasta_anio=2020&ubigeo_listado=&idioma=ES'
-    dataProblemaGeografico = list()
-    dataProblemaGeograficoRequest = requests.get(url)
-    dataProblemaGeografico = dataProblemaGeograficoRequest.json()
-    for i in dataProblemaGeografico:
-        if (i["departamento"] in listaDepartamentos):
-            index = listaDepartamentos.index(i["departamento"])
-            listaProblemasGeograficoDatos[index] = int(listaProblemasGeograficoDatos[index]) + int(i["dato"].replace(" ",""))
-    
-def getAdultosMayor():
-	url2 = "https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=516860&tipo_ubigeo=1&desde_anio=2017&hasta_anio=2017&ubigeo_listado=&idioma=ES"
-	dataProblemaAdultoMayor = list()
-	dataProblemaAdultoMayorRequest = requests.get(url2)
-	dataProblemaAdultoMayor = dataProblemaAdultoMayorRequest.json()
- 
- 
-def getAccidentesTransitos():
-	url3 = "https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=394842&tipo_ubigeo=1&desde_anio=2021&hasta_anio=2021&ubigeo_listado=&idioma=ES"
-	dataAccidentesTransito = list()
-	dataAccidentesTransitoRequest = requests.get(url3)
-	dataAccidentesTransito = dataAccidentesTransitoRequest.json()
-
-def normalize(s):
-    replacements = (
-        ("á", "a"),
-        ("é", "e"),
-        ("í", "i"),
-        ("ó", "o"),
-        ("ú", "u"),
-    )
-    for a, b in replacements:
-        s = s.replace(a, b).replace(a.upper(), b.upper())
-    return s
-
-"""
