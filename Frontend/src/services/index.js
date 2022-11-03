@@ -9,3 +9,44 @@ export function getSugerencia(file){
         "file":file,
     });
 }
+
+export function getCantidadIncidencias(fechaInicio,fechaFin,cliente,departamento){
+    console.log("Así se manda al servicio");
+    console.log(fechaInicio);
+    console.log(fechaFin);
+    console.log(cliente);
+    console.log(departamento);
+    return axios.post(URL+"/incidencias",{
+        "fechaInicio":fechaInicio,
+        "fechaFin":fechaFin,
+        "cliente":cliente,
+        "departamento":departamento,
+    });
+}
+
+export function getIncidenciasPorTipo(fechaInicio,fechaFin,cliente,departamento){
+    console.log("Así se manda al servicio");
+    console.log(fechaInicio);
+    console.log(fechaFin);
+    console.log(cliente);
+    console.log(departamento);
+    return axios.post(URL+"/incidencias/tipoIncidencia",{
+        "fechaInicio":fechaInicio,
+        "fechaFin":fechaFin,
+        "cliente":cliente,
+        "departamento":departamento,
+    });
+}
+
+export function getIncidenciasMensual(){
+    return axios.post(URL+"/incidencias/mensual",{
+
+    });
+}
+
+export function getPorcentajeProveedor(fechaInicio,fechaFin){
+    return axios.post(URL+"/incidencias/tipoIncidencia/proveedor",{
+        "fechaInicio":fechaInicio,
+        "fechaFin":fechaFin,
+    });
+}
