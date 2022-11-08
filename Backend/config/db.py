@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import sessionmaker
 
 SECRET = b'patitosecurity'
 
-engine = create_engine("mysql+pymysql://root:root@127.0.0.1:3306/desa",isolation_level="READ UNCOMMITTED")
+engine = create_engine("mysql+pymysql://admin:fernandez21R@datatesis.cjwlwkvq6cdy.us-east-1.rds.amazonaws.com:3306/datatesisBD",isolation_level="READ UNCOMMITTED")
 
 meta = MetaData()
 

@@ -3,22 +3,24 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from config.db import conn, SECRET
 from hashlib import pbkdf2_hmac
+from modules.ClienteModules import *
 import numpy as np
 from fastapi import FastAPI, File, UploadFile
 from geopy.geocoders import Nominatim
 from modules import *
 from xgboost import XGBClassifier
-
+from schemas.ClienteSchema import Cliente
 import requests
 import csv
 import pandas as pd 
 import io
 import datetime
+from config.db import conn
 from datetime import timezone
 import dateutil.parser
 import json
 from sqlalchemy import select
-
+from fastapi import Body, Query, Path, Form, Header, Cookie, UploadFile, File
 router = APIRouter()
 
 """
@@ -210,6 +212,11 @@ dictionarySugerencias = {'REGISTRAR CORRECTAMENTE LA DIRECCION DE DESTINO': 0,
  'OK': 7}
 
 dictionaryVias = {'TT': 0, 'TA': 1}
+
+@router.post("/registrarCliente/")
+async def registrarCliente(cliente: Cliente = Body(...)):
+    return registrarCliente(cliente)
+
 
 
 @router.post("/uploadfile/")
