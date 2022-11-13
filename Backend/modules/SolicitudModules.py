@@ -1,6 +1,6 @@
 from config.db import conn, SECRET
-from models.Cliente import cliente as clienteModel
-from schemas.ClienteSchema import Cliente
+from models.Solicitud import solicitud as solicitudModel
+from schemas.SolicitudSchema import Solicitud
 from fastapi import Response
 from sqlalchemy import null, select
 from starlette.status import HTTP_200_OK
@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 
-def registrarClienteModule(cliente:Cliente):
-    nuevoCliente = cliente.dict()
-    resultado = conn.execute(clienteModel.insert().values(nuevoCliente))
+def registrarSolicitudModule(solicitud:Solicitud):
+    nuevoSolicitud = solicitud.dict()
+    resultado = conn.execute(solicitudModel.insert().values(nuevoSolicitud))
     return resultado.lastrowid

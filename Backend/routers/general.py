@@ -4,12 +4,24 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from config.db import conn, SECRET
 from hashlib import pbkdf2_hmac
 from modules.ClienteModules import *
+from modules.DepartamentoModules import *
+from modules.ProvinciaModules import *
+from modules.DistritoModules import *
+from modules.ProveedorModules import *
+from modules.SolicitudModules import *
+from modules.UsuarioModules import *
 import numpy as np
 from fastapi import FastAPI, File, UploadFile
 from geopy.geocoders import Nominatim
 from modules import *
 from xgboost import XGBClassifier
 from schemas.ClienteSchema import Cliente
+from schemas.DepartamentoSchema import Departamento
+from schemas.ProvinciaSchema import Provincia
+from schemas.DistritoSchema import Distrito
+from schemas.ProveedorSchema import Proveedor
+from schemas.SolicitudSchema import Solicitud
+from schemas.UsuarioSchema import Usuario
 import requests
 import csv
 import pandas as pd 
@@ -215,9 +227,34 @@ dictionaryVias = {'TT': 0, 'TA': 1}
 
 @router.post("/registrarCliente/")
 async def registrarCliente(cliente: Cliente = Body(...)):
-    return registrarCliente(cliente)
+    return registrarClienteModule(cliente)
 
 
+@router.post("/registrarDepartamento/")
+async def registrarDepartamento(departamento: Departamento = Body(...)):
+    return registrarDepartamentoModule(departamento)
+
+
+@router.post("/registrarProvincia/")
+async def registrarProvincia(provincia: Provincia = Body(...)):
+    return registrarProvinciaModule(provincia)
+
+
+@router.post("/registrarDistrito/")
+async def registrarDistrito(distrito: Distrito = Body(...)):
+    return registrarDistritoModule(distrito)
+
+@router.post("/registrarProveedor/")
+async def registrarProveedor(proveedor: Proveedor = Body(...)):
+    return registrarProveedorModule(proveedor)
+
+@router.post("/registrarSolicitud/")
+async def registrarSolicitud(solicitud: Solicitud = Body(...)):
+    return registrarSolicitudModule(solicitud)
+
+@router.post("/registrarUsuario/")
+async def registrarUsuario(usuario: Usuario = Body(...)):
+    return registrarUsuarioModule(usuario)
 
 @router.post("/uploadfile/")
 async def create_upload_file(file: UploadFile | None = None):
