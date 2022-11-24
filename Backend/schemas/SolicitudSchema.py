@@ -35,7 +35,6 @@ class Solicitud(BaseModel):
     idDistritoDestino:Optional[int] = Field(default=None, example=1)
     razonNombreDestinatario: Optional[str] = Field(
         ...,
-        min_length=1,
         max_length=100,
         example="Lima"
     )

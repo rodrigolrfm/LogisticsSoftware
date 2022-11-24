@@ -306,7 +306,7 @@ async def create_upload_file(file: UploadFile | None = None):
         proveedor = dataset.loc[0,"PROVEEDOR DE TRANSPORTE"]
         fecha_manifiesto = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_MANIFIESTO"]),'%d/%m/%Y')
         estado_manifiesto = dataset.loc[0,"ESTADO_MANIFIESTO"]  
-        incidencia_manifiesto = dataset.loc[0,"INCIDENCIA_MANIFIESTO"]
+        incidencia_manifiesto = None if math.isnan(dataset.loc[0,"INCIDENCIA_MANIFIESTO"]) else dataset.loc[0,"INCIDENCIA_MANIFIESTO"]
         fecha_manifiesto_recogido = datetime.datetime.strptime(str(dataset.loc[0,"FECHA MANIFIESTO_RECOGIDO"]),'%d/%m/%Y')
         fecha_manifiesto_informado = datetime.datetime.strptime(str(dataset.loc[0,"FECHA MANIFIESTO_INFORMADO"]),'%d/%m/%Y')
         fecha_manifiesto_verificado = datetime.datetime.strptime(str(dataset.loc[0,"FECHA MANIFIESTO_VERIFICADO"]),'%d/%m/%Y')
@@ -408,13 +408,14 @@ async def create_upload_file(file: UploadFile | None = None):
         listaDepartamentos = list(map(lambda x : normalize(x), listaDepartamentos))
         
         dataCrime.rename(columns = {0:'AÑO', 1:'DEPARTAMENTO',2:'INDICE_DELITOS'}, inplace = True)
-        
         dataCrime["CANT_FENO_NAT"]=0
         dataCrime["CANT_PEA"]=0
         dataCrime["CANT_ACC_TRANSITO"]=0
         val_prob_geo = ""
         val_cant_adul_mayor = "" 
         val_cant_acc_transito = "" 
+        val_cant_cant_PEA = ""
+        
         for i in dataCrime.index:
             departamento = str(dataCrime.loc[i,"DEPARTAMENTO"])
             if (departamento in listaDepartamentos):
@@ -427,6 +428,10 @@ async def create_upload_file(file: UploadFile | None = None):
                 dataCrime.loc[i,"CANT_ACC_TRANSITO"] = val_cant_acc_transito
         
         newDataSet = pd.merge(dataset, dataCrime, how='inner', on = 'DEPARTAMENTO')
+        indiceCriminalidad = newDataSet.loc[0,"INDICE_DELITOS"]
+        cant_feno_nat = newDataSet.loc[0,"CANT_FENO_NAT"] 
+        cant_pea = newDataSet.loc[0,"CANT_PEA"]  
+        cant_acc_transito = newDataSet.loc[0,"CANT_ACC_TRANSITO"]    
         dataset = newDataSet
         dataset["DIRECCION1"] = dataset["DIRECCION1"].str.upper()
         dataset["TIENE_AV"] = dataset.DIRECCION1.str.contains("AV|AVENIDA",regex=True,case=False)
@@ -579,7 +584,7 @@ async def create_upload_file(file: UploadFile | None = None):
         idCliente = listarClienteModule(razonSocial=cliente)
         idProveedor = listarProveedorModule(razonSocial=proveedor)
         print("numero paquetes" + str(numero_paquetes))
-        solicitud = Solicitud(guia=guia,estado=estado,razonNombreDestinatario="a", fechaEntrega=fecha_entrega, servicio=servicio, idDistritoOrigen=idDistritoOrigen,
+        solicitud = Solicitud(guia=guia,estado=estado,razonNombreDestinatario="", fechaEntrega=fecha_entrega, servicio=servicio, idDistritoOrigen=idDistritoOrigen,
                                 numeroPaquete=numero_paquetes, contadorVisitas=contador_visitas, idDistritoDestino=idDistritoDestino,
                                 primeraDireccion=primera_direccion, segundaDireccion=segunda_direccion, fechaEmbarque=fecha_embarque,
                                 fechaSalidaProyectada=fecha_salida_proyectada, fechaLlegadaProyectada=fecha_llegada_proyectada,
@@ -587,9 +592,8 @@ async def create_upload_file(file: UploadFile | None = None):
                                 estadoManifiesto=estado_manifiesto, incidenciaManifiesto=incidencia_manifiesto, fechaManifiestoRecogido=fecha_manifiesto_recogido,
                                 fechaManifiestoInformado=fecha_manifiesto_informado, fechaManifiestoVerificado=fecha_manifiesto_verificado, fechaReparto=fecha_reparto,
                                 tipoIncidenciaReparto=tipo_incidencia_reparto, fechaIncidenciaReparto=fecha_incidencia_reparto, fechaCompromiso=fecha_compromiso,
-                                clima=clima, temperatura=temperatura, humedad=humedad, 
-                                cantAccidentesTransito=val_cant_acc_transito, cantFenoNatural=val_prob_geo, 
-                                sugerencia=stringResponse)
+                                clima=clima, temperatura=temperatura, humedad=humedad, cantAccidentesTransito=cant_acc_transito, cantFenoNatural=cant_feno_nat, 
+                                cantPEA=cant_pea,indiceCriminalidad=indiceCriminalidad, sugerencia=stringResponse)
         registrarSolicitudModule(solicitud)
 
         file.file.close()
@@ -734,10 +738,10 @@ async def create_upload_file(file: UploadFile | None = None):
         
         # Se crea nuevo dataframe
         newDataSet = pd.merge(dataset, dataCrime, how='inner', on = 'DEPARTAMENTO')
-        
+
         # Se reemplza por el anterior
         dataset = newDataSet.copy()
-        
+
         dataset["DIRECCION1"] = dataset["DIRECCION1"].str.upper()
         dataset["TIENE_AV"] = dataset.DIRECCION1.str.contains("AV|AVENIDA",regex=True,case=False)
         dataset["TIENE_JR"] = dataset.DIRECCION1.str.contains("JR|JIRON",regex=True,case=False)
