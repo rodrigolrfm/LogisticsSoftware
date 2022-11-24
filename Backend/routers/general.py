@@ -21,6 +21,7 @@ from schemas.ProvinciaSchema import Provincia
 from schemas.DistritoSchema import Distrito
 from schemas.ProveedorSchema import Proveedor
 from schemas.SolicitudSchema import Solicitud
+from schemas.SolicitudSchema import SolicitudUnica
 from schemas.UsuarioSchema import Usuario
 import requests
 import csv
@@ -225,6 +226,15 @@ dictionarySugerencias = {'REGISTRAR CORRECTAMENTE LA DIRECCION DE DESTINO': 0,
 
 dictionaryVias = {'TT': 0, 'TA': 1}
 
+
+@router.post("/obtenerSolicitud/")
+async def obtenerSolicitudUnica(solicitudUnica:SolicitudUnica):
+    return obtenerSolicitud(solicitudUnica)
+
+
+
+
+
 @router.post("/registrarCliente/")
 async def registrarCliente(cliente: Cliente = Body(...)):
     return registrarClienteModule(cliente)
@@ -327,10 +337,10 @@ async def create_upload_file(file: UploadFile | None = None):
         dataProblemaGeograficoRequest = requests.get(url)
         dataProblemaGeografico = dataProblemaGeograficoRequest.json()
         
-        url2 = "https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=516860&tipo_ubigeo=1&desde_anio=2017&hasta_anio=2017&ubigeo_listado=&idioma=ES"
-        dataProblemaAdultoMayor = list()
-        dataProblemaAdultoMayorRequest = requests.get(url2)
-        dataProblemaAdultoMayor = dataProblemaAdultoMayorRequest.json()
+        url2 = "https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=389219&tipo_ubigeo=1&desde_anio=2020&hasta_anio=2020&ubigeo_listado=&idioma=ES"
+        dataPEA = list()
+        dataPEA = requests.get(url2)
+        dataProblemaPEA = dataPEA.json()
         
         url3 = "https://systems.inei.gob.pe/SIRTOD/app/consulta/getTableDataYear?indicador_listado=394842&tipo_ubigeo=1&desde_anio=2021&hasta_anio=2021&ubigeo_listado=&idioma=ES"
         dataAccidentesTransito = list()
@@ -349,13 +359,15 @@ async def create_upload_file(file: UploadFile | None = None):
                 index = listaDepartamentos.index(i["departamento"])
                 listaProblemasGeograficoDatos[index] = int(listaProblemasGeograficoDatos[index]) + int(i["dato"].replace(" ",""))
         
-        # Calculo de datos de adultos mayores
-        listaDatosAdultosMayores = [0]*25
-        for i in dataProblemaAdultoMayor:
+        # Calculo de PEA
+        listaDatosPEA = [0]*25
+        for i in dataProblemaPEA:
             if (i["departamento"] in listaDepartamentos):
                 index = listaDepartamentos.index(i["departamento"])
-                listaDatosAdultosMayores[index] = int(listaDatosAdultosMayores[index]) + int(i["dato"].replace(" ",""))
-        
+                variable = i["dato"].replace(" ","")
+                variableaux = variable.replace(",",".")
+                listaDatosPEA[index] = float(listaDatosPEA[index]) + float(variableaux.replace(" ",""))
+                
         # Calculo de datos de accidentes de transito
         listaDatosAccTransito = [0]*25
         for i in dataAccidentesTransito:
@@ -368,7 +380,7 @@ async def create_upload_file(file: UploadFile | None = None):
         dataCrime.rename(columns = {0:'AÑO', 1:'DEPARTAMENTO',2:'INDICE_DELITOS'}, inplace = True)
         
         dataCrime["CANT_FENO_NAT"]=0
-        dataCrime["CANT_ADULTOMAYOR"]=0
+        dataCrime["CANT_PEA"]=0
         dataCrime["CANT_ACC_TRANSITO"]=0
         
         for i in dataCrime.index:
@@ -376,10 +388,10 @@ async def create_upload_file(file: UploadFile | None = None):
             if (departamento in listaDepartamentos):
                 index_departamento = listaDepartamentos.index(departamento)
                 val_prob_geo = listaProblemasGeograficoDatos[index_departamento]
-                val_cant_adul_mayor = listaDatosAdultosMayores[index_departamento]
+                val_cant_cant_PEA = listaDatosPEA[index_departamento]
                 val_cant_acc_transito = listaDatosAccTransito[index_departamento]
                 dataCrime.loc[i,"CANT_FENO_NAT"] = val_prob_geo
-                dataCrime.loc[i,"CANT_ADULTOMAYOR"] = val_cant_adul_mayor
+                dataCrime.loc[i,"CANT_PEA"] = val_cant_cant_PEA
                 dataCrime.loc[i,"CANT_ACC_TRANSITO"] = val_cant_acc_transito
         
         newDataSet = pd.merge(dataset, dataCrime, how='inner', on = 'DEPARTAMENTO')
