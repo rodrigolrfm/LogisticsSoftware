@@ -30,7 +30,7 @@ class Solicitud(BaseModel):
         example="Lima"
     )
     idDistritoOrigen:Optional[int] = Field(default=None, example=1)
-    numeroPaquet:Optional[int] = Field(default=None, example=1)
+    numeroPaquete:Optional[int] = Field(default=None, example=1)
     contadorVisitas:Optional[int] = Field(default=None, example=1)
     idDistritoDestino:Optional[int] = Field(default=None, example=1)
     razonNombreDestinatario: Optional[str] = Field(

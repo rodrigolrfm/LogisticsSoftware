@@ -14,3 +14,10 @@ def registrarDistritoModule(distrito:Distrito):
     nuevoDistrito = distrito.dict()
     resultado = conn.execute(distritoModel.insert().values(nuevoDistrito))
     return resultado.lastrowid
+
+def listarDistritoModule(nombre):
+    distrito = conn.execute(distritoModel.select().where(distritoModel.c.nombreDistrito == nombre)).fetchone()
+    if(distrito == None): 
+        return registrarDistritoModule(distrito=Distrito(nombreDistrito=nombre))
+    else: 
+        return distrito._mapping['id']

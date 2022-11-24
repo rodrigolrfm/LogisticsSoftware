@@ -14,3 +14,11 @@ def registrarProveedorModule(proveedor:Proveedor):
     nuevoProveedor = proveedor.dict()
     resultado = conn.execute(proveedorModel.insert().values(nuevoProveedor))
     return resultado.lastrowid
+
+
+def listarProveedorModule(razonSocial):
+    proveedor = conn.execute(proveedorModel.select().where(proveedorModel.c.razonSocial == razonSocial)).fetchone()
+    if(proveedor == None): 
+        return registrarProveedorModule(proveedor=Proveedor(razonSocial=razonSocial))
+    else: 
+        return proveedor._mapping['id']   

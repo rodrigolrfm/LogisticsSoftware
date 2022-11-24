@@ -31,6 +31,7 @@ from config.db import conn
 from datetime import timezone
 import dateutil.parser
 import json
+import math
 from sqlalchemy import select
 from fastapi import Body, Query, Path, Form, Header, Cookie, UploadFile, File
 router = APIRouter()
@@ -53,6 +54,8 @@ def normalize(s):
     for a, b in replacements:
         s = s.replace(a, b).replace(a.upper(), b.upper())
     return s
+
+ruta_modelo = "C:\\Users\\Diego\\Documents\\LogisticsSoftware\\Algortimos\\PesoModeloActual\\modelov4.json"
 
 dictionaryServicios = {'PROVINCIA': 0,
  'PEDIDO': 1,
@@ -272,9 +275,36 @@ async def create_upload_file(file: UploadFile | None = None):
         departamento = dataset.loc[0,"DEPARTAMENTO"]
         distrito = dataset.loc[0,"DISTRITO"]
         provincia = dataset.loc[0,"PROVINCIA"]
-        cliente = dataset.loc[0,"CLIENTE"]
         incidente = dataset.loc[0,"TIPO_INCIDENCIA_REPARTO"]
+
+        guia = dataset.loc[0,"GUIA"] 
+        estado = dataset.loc[0,"ESTADO_GUIA"] 
+        fecha_entrega = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_ENTREGA"]) ,'%d/%m/%Y')
+        r_servicio = dataset.loc[0,"SERVICIO"] 
+        nombre_distrito_origen = dataset.loc[0,"ORIGEN"]  
+        numero_paquetes = dataset.loc[0,"PAQUETES"] 
+        contador_visitas = dataset.loc[0,"CONTADOR_VISITAS"]   
+        nombre_distrito_destino = dataset.loc[0,"DESTINO"] 
+        primera_direccion = dataset.loc[0,"DIRECCION1"]  
+        segunda_direccion = dataset.loc[0,"DIRECCION2"]
+        fecha_embarque = None if math.isnan(dataset.loc[0,"FECHA_EMBARQUE"]) else datetime.datetime.strptime(str(dataset.loc[0,"FECHA_EMBARQUE"]),'%d/%m/%Y')
+        fecha_salida_proyectada = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_SALIDA_PROYECT"]),'%d/%m/%Y')
+        fecha_llegada_proyectada = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_LLEGADA_PROYECT"]),'%d/%m/%Y')
+        fecha_llegada_real = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_LLEGADA_REAL"]) ,'%d/%m/%Y')
+        r_via = dataset.loc[0,"VIA"]   
+        cliente = dataset.loc[0,"CLIENTE"]
         proveedor = dataset.loc[0,"PROVEEDOR DE TRANSPORTE"]
+        fecha_manifiesto = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_MANIFIESTO"]),'%d/%m/%Y')
+        estado_manifiesto = dataset.loc[0,"ESTADO_MANIFIESTO"]  
+        incidencia_manifiesto = dataset.loc[0,"INCIDENCIA_MANIFIESTO"]
+        fecha_manifiesto_recogido = datetime.datetime.strptime(str(dataset.loc[0,"FECHA MANIFIESTO_RECOGIDO"]),'%d/%m/%Y')
+        fecha_manifiesto_informado = datetime.datetime.strptime(str(dataset.loc[0,"FECHA MANIFIESTO_INFORMADO"]),'%d/%m/%Y')
+        fecha_manifiesto_verificado = datetime.datetime.strptime(str(dataset.loc[0,"FECHA MANIFIESTO_VERIFICADO"]),'%d/%m/%Y')
+        fecha_reparto = datetime.datetime.strptime(str(dataset.loc[0,"FECHA REPARTO"]),'%d/%m/%Y')
+        tipo_incidencia_reparto = dataset.loc[0,"TIPO_INCIDENCIA_REPARTO"]
+        fecha_incidencia_reparto = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_INCIDENCIA_REPARTO"]),'%d/%m/%Y')
+        fecha_compromiso = datetime.datetime.strptime(str(dataset.loc[0,"FECHA_COMPROMISO"]),'%d/%m/%Y')
+        
         print(departamento)
         getLoc = loc.geocode(departamento) 
         longitud =  getLoc.longitude
@@ -370,7 +400,9 @@ async def create_upload_file(file: UploadFile | None = None):
         dataCrime["CANT_FENO_NAT"]=0
         dataCrime["CANT_ADULTOMAYOR"]=0
         dataCrime["CANT_ACC_TRANSITO"]=0
-        
+        val_prob_geo = ""
+        val_cant_adul_mayor = "" 
+        val_cant_acc_transito = "" 
         for i in dataCrime.index:
             departamento = str(dataCrime.loc[i,"DEPARTAMENTO"])
             if (departamento in listaDepartamentos):
@@ -402,7 +434,7 @@ async def create_upload_file(file: UploadFile | None = None):
         dataset = dataset.drop(dataset[dataset.ESTADO_MANIFIESTO == "INFORMADO"].index)
         dataset = dataset.drop(dataset[dataset.ESTADO_MANIFIESTO == "DDV"].index)
         dataset = dataset.drop(dataset[dataset.DEPARTAMENTO.isnull()].index)
-        
+
         dataset = dataset.drop(['GUIA'], axis=1)
         dataset = dataset.drop(['AÑO'], axis=1)
         dataset = dataset.drop(['DIRECCION1'], axis=1)
@@ -467,7 +499,7 @@ async def create_upload_file(file: UploadFile | None = None):
         dataset["TIENE_JR"] =dataset["TIENE_JR"].astype('int')
         dataset["TIENE_CALLE"] =dataset["TIENE_CALLE"].astype('int')
         dataset["NO_TIENE_REF"] = dataset["NO_TIENE_REF"].astype('int')
-        
+        via=""
         for i in dataset.index:
             departamento = str(dataset.loc[i,"DEPARTAMENTO"])
             servicio = str(dataset.loc[i,"SERVICIO"])
@@ -497,17 +529,20 @@ async def create_upload_file(file: UploadFile | None = None):
         #dataset["TIPO_INCIDENCIA_REPARTO"] =dataset["TIPO_INCIDENCIA_REPARTO"].astype('int')
         dataset["CLIMA"] = dataset["CLIMA"].astype('int')
         
-        model = XGBClassifier()
+        # model = XGBClassifier()
         
-        model.load_model('D:\\CICLO12\\Tesis2\\TesisSoftware\\LogisticsSoftware\\Algortimos\\PesoModeloActual\\modelov4.json')
-        print(model)
-        print("Luego del model")
-        print(dataset.columns)
-        y_pred = model.predict(dataset)
-        predictions = [round(value) for value in y_pred]
+        # model.load_model(ruta_modelo)
+        # print(model)
+        # print("Luego del model")
+        # print(dataset.columns)
+        # y_pred = model.predict(dataset)
+        # predictions = [round(value) for value in y_pred]
         
-        valPrediction = predictions[0]
-        sugerenciaPred = list(dictionarySugerencias.keys())[list(dictionarySugerencias.values()).index(predictions[0])]
+        # valPrediction = predictions[0]
+        
+        valPrediction = 0
+        sugerenciaPred = list(dictionarySugerencias.keys())[list(dictionarySugerencias.values()).index(valPrediction)]
+
         if (valPrediction==3):
             stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(cliente),str(distrito),str(provincia),str(departamento),sugerenciaPred)
         elif (valPrediction==0):
@@ -527,7 +562,24 @@ async def create_upload_file(file: UploadFile | None = None):
         elif (valPrediction==7):
             # Caso OK
             stringResponse = sugerenciaPred
-        
+        idDistritoOrigen = listarDistritoModule(nombre=nombre_distrito_origen)
+        idDistritoDestino = listarDistritoModule(nombre=nombre_distrito_destino)
+        idCliente = listarClienteModule(razonSocial=cliente)
+        idProveedor = listarProveedorModule(razonSocial=proveedor)
+        print("numero paquetes" + str(numero_paquetes))
+        solicitud = Solicitud(guia=guia,estado=estado,razonNombreDestinatario="a", fechaEntrega=fecha_entrega, servicio=servicio, idDistritoOrigen=idDistritoOrigen,
+                                numeroPaquete=numero_paquetes, contadorVisitas=contador_visitas, idDistritoDestino=idDistritoDestino,
+                                primeraDireccion=primera_direccion, segundaDireccion=segunda_direccion, fechaEmbarque=fecha_embarque,
+                                fechaSalidaProyectada=fecha_salida_proyectada, fechaLlegadaProyectada=fecha_llegada_proyectada,
+                                fechaLlegadaReal=fecha_llegada_real, via=via, idCliente=idCliente, idProveedor=idProveedor, fechaManifiesto=fecha_manifiesto,
+                                estadoManifiesto=estado_manifiesto, incidenciaManifiesto=incidencia_manifiesto, fechaManifiestoRecogido=fecha_manifiesto_recogido,
+                                fechaManifiestoInformado=fecha_manifiesto_informado, fechaManifiestoVerificado=fecha_manifiesto_verificado, fechaReparto=fecha_reparto,
+                                tipoIncidenciaReparto=tipo_incidencia_reparto, fechaIncidenciaReparto=fecha_incidencia_reparto, fechaCompromiso=fecha_compromiso,
+                                clima=clima, temperatura=temperatura, humedad=humedad, 
+                                cantAccidentesTransito=val_cant_acc_transito, cantFenoNatural=val_prob_geo, 
+                                sugerencia=stringResponse)
+        registrarSolicitudModule(solicitud)
+
         file.file.close()
         
         return {"Sugerencia": stringResponse}

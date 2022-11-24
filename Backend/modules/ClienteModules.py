@@ -14,3 +14,10 @@ def registrarClienteModule(cliente:Cliente):
     nuevoCliente = cliente.dict()
     resultado = conn.execute(clienteModel.insert().values(nuevoCliente))
     return resultado.lastrowid
+
+def listarClienteModule(razonSocial):
+    cliente = conn.execute(clienteModel.select().where(clienteModel.c.razonSocial == razonSocial)).fetchone()
+    if(cliente == None): 
+        return registrarClienteModule(cliente=Cliente(razonSocial=razonSocial))
+    else: 
+        return cliente._mapping['id']   
