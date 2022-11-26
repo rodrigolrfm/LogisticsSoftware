@@ -16,7 +16,7 @@ from models.Provincia import provincia as provinciaModel
 from models.Departamento import departamento as departamentoModel
 from models.Cliente import cliente as clienteModel
 from models.Proveedor import proveedor as proveedorModel
-from utils.queries_sql import QUERY_LISTAR_CANTIDAD_INCIDENCIAS,QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_TIPO, QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO,QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO_POR_PROVEEDOR
+from utils.queries_sql import QUERY_LISTAR_CANTIDAD_INCIDENCIAS,QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_TIPO, QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO,QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO_POR_PROVEEDOR, QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_MES
 
 from fastapi import Response
 from sqlalchemy import null, select
@@ -161,3 +161,13 @@ def listarCantidadIncidenciasPorcentajeProveedor(filtro: ListarIncidenciasProvee
     resultado_proveedor = conn.execute(query_cantidades_text).fetchone()
     print(resultado_proveedor)
     return ListarIncidenciasProveedorOut(porcentaje=resultado_proveedor[0]/resultado_total[0])
+
+
+def listarCantidadIncidenciasPorMes():
+    hoy = datetime.date.today()
+    anho_actual = hoy.strftime("%Y")
+    query_cantidades_text = QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_MES.format(anho=anho_actual)
+    resultado = conn.execute(query_cantidades_text).fetchone()
+    return IncidenciaMensualOut(enero=resultado["enero"], febrero=resultado["febrero"], marzo=resultado["marzo"], abril=resultado["abril"], 
+                                    mayo=resultado["mayo"], junio=resultado["junio"], julio=resultado["julio"], agosto=resultado["agosto"],
+                                    septiembre=resultado["septiembre"], octubre=resultado["octubre"], noviembre=resultado["noviembre"], diciembre=resultado["diciembre"])

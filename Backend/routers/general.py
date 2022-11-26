@@ -918,6 +918,9 @@ async def create_upload_file(file: UploadFile | None = None):
 async def listar_cantidad_incidencias(filtro: ListarCantidadIncidenciasIn ):
     return listarCantidadIncidencias(filtro)
 
+@router.post("/incidencias/mensual")
+async def listar_cantidad_incidencias_por_mes():
+    return listarCantidadIncidenciasPorMes()
 
 @router.post("/incidencias/tipoIncidencia")
 async def listar_cantidad_incidencias_por_tipo(filtro: ListarIncidenciasPorTipoIn ):
