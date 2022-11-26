@@ -1,6 +1,7 @@
 from config.db import conn, SECRET
 from models.Usuario import usuario as usuarioModel
 from schemas.UsuarioSchema import Usuario
+from schemas.UsuarioSchema import *
 from fastapi import Response
 from sqlalchemy import null, select
 from starlette.status import HTTP_200_OK
@@ -16,5 +17,16 @@ def registrarUsuarioModule(usuario:Usuario):
     return resultado.lastrowid
 
 
-def loguearse():
-    return 1
+def loguearse(usuarioIniciarSesionIN:UsuarioIniciarSesionIN):
+    
+    userLog = usuarioIniciarSesionIN.dict()
+    userBD = conn.execute(usuarioModel.select().where((usuarioModel.c.nombreUsuario == str(userLog['nombreUsuario'])) & 
+                                                      (usuarioModel.c.password == str(userLog['password'])))).fetchone()
+    usuarioResponse = UsuarioOUT(
+        id=int(userBD['id']),
+        nombreUsuario=str(userBD['nombreUsuario']),
+        nombres=str(userBD['nombres']),
+        apellidos=str(userBD['apellidos'])   
+    )
+    
+    return usuarioResponse

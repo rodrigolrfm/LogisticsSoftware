@@ -23,7 +23,7 @@ from schemas.ProveedorSchema import Proveedor
 from schemas.SolicitudSchema import Solicitud
 from schemas.SolicitudSchema import SolicitudUnica
 from schemas.SolicitudSchema import SolicitudListarIncidentesIN
-from schemas.UsuarioSchema import Usuario
+from schemas.UsuarioSchema import *
 import requests
 import csv
 import pandas as pd 
@@ -239,7 +239,9 @@ async def obtenerSolicitudUnica(solicitudUnica:SolicitudUnica):
 async def obtenerListaSolicitud(solicitudListarIncidentesIN:SolicitudListarIncidentesIN):
     return obtenerListaSolicitudModule(solicitudListarIncidentesIN)
 
-
+@router.post("/loguin/")
+async def iniciarSesion(usuarioIniciarSesionIN:UsuarioIniciarSesionIN):
+    return loguearse(usuarioIniciarSesionIN)
 
 @router.post("/registrarCliente/")
 async def registrarCliente(cliente: Cliente = Body(...)):
