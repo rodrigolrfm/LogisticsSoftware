@@ -14,3 +14,7 @@ def registrarDepartamentoModule(departamento:Departamento):
     nuevoDepartamento = departamento.dict()
     resultado = conn.execute(departamentoModel.insert().values(nuevoDepartamento))
     return resultado.lastrowid
+
+def listarDepartamentosModule(): 
+    resultado = conn.execute(departamentoModel.select()).fetchall()
+    return resultado
