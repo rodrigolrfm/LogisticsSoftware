@@ -22,6 +22,7 @@ from schemas.DistritoSchema import Distrito
 from schemas.ProveedorSchema import Proveedor
 from schemas.SolicitudSchema import Solicitud
 from schemas.SolicitudSchema import SolicitudUnica
+from schemas.SolicitudSchema import SolicitudListarIncidentesIN
 from schemas.UsuarioSchema import Usuario
 import requests
 import csv
@@ -234,7 +235,9 @@ dictionaryVias = {'TT': 0, 'TA': 1}
 async def obtenerSolicitudUnica(solicitudUnica:SolicitudUnica):
     return obtenerSolicitud(solicitudUnica)
 
-
+@router.post("/obtenerListaSolicitud/")
+async def obtenerListaSolicitud(solicitudListarIncidentesIN:SolicitudListarIncidentesIN):
+    return obtenerListaSolicitudModule(solicitudListarIncidentesIN)
 
 
 

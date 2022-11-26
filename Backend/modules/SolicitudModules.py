@@ -4,6 +4,7 @@ from models.Solicitud import solicitud as solicitudModelSelect
 from schemas.SolicitudSchema import Solicitud
 from schemas.SolicitudSchema import SolicitudUnica
 from schemas.SolicitudSchema import SolicitudUnicaRespuesta
+from schemas.SolicitudSchema import *
 from models.Distrito import distrito as distritoModel
 from models.Provincia import provincia as provinciaModel
 from models.Departamento import departamento as departamentoModel
@@ -107,3 +108,91 @@ def obtenerSolicitud(solicitud:SolicitudUnica):
     )    
     
     return solicitudNuevaUnica
+
+
+def obtenerListaSolicitudModule(solicitud:SolicitudListarIncidentesIN):
+    
+    nuevoSolicitud = solicitud.dict()
+    
+    nomCliente = str(nuevoSolicitud['cliente'])
+    idClienteSoli = None
+    if nomCliente is None:
+        clienteRes = conn.execute(clienteModel.select().where(clienteModel.c.razonSocial == nomCliente)).fetchone()
+        idClienteSoli = int(clienteRes['id'])
+    
+    id_cliente_str = idClienteSoli if idClienteSoli is not None else "NULL"
+    
+    
+    nomDepar = nuevoSolicitud['departamento']
+    
+    
+    #Fechas
+    fechaInicio = nuevoSolicitud['fechaInicio']
+    fechaFin = nuevoSolicitud['fechaFin']
+    
+    nombreTipoIncidencia = nuevoSolicitud['tipoIncidencia']
+    solicitudGuia = nuevoSolicitud['numGuia']
+    
+    datetime_object_inicio = datetime.strptime(fechaInicio, '%d/%m/%Y')
+    datetime_object_fin = datetime.strptime(fechaFin, '%d/%m/%Y')
+    
+    num_guia = solicitudGuia if solicitudGuia is not None else "NULL"
+    num_guia_null = "'" + solicitudGuia + "'" if solicitudGuia is not None else "NULL"
+    
+    nom_dep_str = nomDepar if nomDepar is not None else "NULL"
+    nom_dep_null_str = "'" + nomDepar + "'" if nomDepar is not None else "NULL"
+    
+    tipo_incidencia = nombreTipoIncidencia if nombreTipoIncidencia is not None else "NULL"
+    tipo_incidencia_null = "'" + nombreTipoIncidencia + "'" if nombreTipoIncidencia is not None else "NULL"   
+    
+    
+    stringVal = '''select *
+                from Solicitud s
+                inner join Distrito d
+                on s.idDistritoDestino = d.id
+                inner join Provincia p
+                on d.idProvincia = p.id
+                inner join Departamento dep
+                on dep.id = p.idDepartamento
+                where (fechaEntrega >= '{fechaInicio}' and fechaEntrega <= '{fechaFin}') and
+                (guia like '%%{num_guia}%%' or {num_guia_null} is NULL) and 
+                (tipoIncidenciaReparto like '%%{tipo_incidencia}%%' or {tipo_incidencia_null} is NULL) and 
+                (idCliente={id_cliente} or {id_cliente} is NULL) and 
+                (dep.nombreDepartamento LIKE '%%{nom_dep}%%' or {nom_dep_null} is NULL)
+                '''
+    
+    query_soliciutd_text = stringVal.format(
+                            fechaInicio=datetime_object_inicio,
+                            fechaFin=datetime_object_fin,
+                            num_guia=num_guia,
+                            num_guia_null=num_guia_null,
+                            tipo_incidencia=tipo_incidencia,
+                            tipo_incidencia_null=tipo_incidencia_null,
+                            id_cliente=id_cliente_str,
+                            nom_dep=nom_dep_str,
+                            nom_dep_null=nom_dep_null_str
+                        )
+    
+    solicitudes_bd = conn.execute(query_soliciutd_text).fetchall()
+    
+    response = []
+    for solicitud_un in solicitudes_bd:
+        guia_str = solicitud_un['guia']
+        fechaCompromiso_str = solicitud_un['fechaCompromiso']
+        fechaEntrega_str = solicitud_un['fechaEntrega']
+        numeroPaquete_str = int(solicitud_un['numeroPaquete'])
+        cliente_id = solicitud_un['idCliente']
+        clienteResSoli = conn.execute(clienteModel.select().where(clienteModel.c.id == cliente_id)).fetchone()
+        cliente_str_soli = str(clienteResSoli['razonSocial'])
+        estado_str = solicitud_un['estado']
+        obj = SolicitudListarIncidentesOUT(
+            guia=guia_str,
+            fechaCompromiso=fechaCompromiso_str,
+            fechaEntrega=fechaEntrega_str,
+            numeroPaquete=numeroPaquete_str,
+            cliente=cliente_str_soli,
+            estado=estado_str
+        )
+        response.append(obj.__dict__)
+    
+    return response
