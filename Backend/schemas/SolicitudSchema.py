@@ -247,6 +247,9 @@ class ListarIncidenciasPorTipoOut(BaseModel):
 class ListarIncidenciasProveedorIn(BaseModel):
     fechaInicio: Optional[str] = Field(default=None, example='21/01/2022')
     fechaFin: Optional[str] = Field(default=None, example='21/01/2022')
+    cliente: Optional[str] = Field(default=None, example="Lima")
+    departamento: Optional[str] = Field(default=None, example="Lima")
+    proveedor: Optional[str] = Field(default=None, example="Lima")
 
 class ListarIncidenciasProveedorOut(BaseModel):
     porcentaje:float

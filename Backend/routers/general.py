@@ -920,8 +920,13 @@ async def listar_cantidad_incidencias(filtro: ListarCantidadIncidenciasIn ):
 
 
 @router.post("/incidencias/tipoIncidencia")
-async def listar_cantidad_incidencias(filtro: ListarIncidenciasPorTipoIn ):
+async def listar_cantidad_incidencias_por_tipo(filtro: ListarIncidenciasPorTipoIn ):
     return listarCantidadIncidenciasPorTipo(filtro)
+
+
+@router.post("/incidencias/tipoIncidencia/proveedor")
+async def listar_cantidad_incidencias_porcentaje_proveedor(filtro: ListarIncidenciasProveedorIn ):
+    return listarCantidadIncidenciasPorcentajeProveedor(filtro)
 
 @router.post("/departamentos")
 async def listar_cantidad_departamentos():

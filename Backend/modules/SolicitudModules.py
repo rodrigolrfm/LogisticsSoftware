@@ -16,7 +16,7 @@ from models.Provincia import provincia as provinciaModel
 from models.Departamento import departamento as departamentoModel
 from models.Cliente import cliente as clienteModel
 from models.Proveedor import proveedor as proveedorModel
-from utils.queries_sql import QUERY_LISTAR_CANTIDAD_INCIDENCIAS,QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_TIPO
+from utils.queries_sql import QUERY_LISTAR_CANTIDAD_INCIDENCIAS,QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_TIPO, QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO,QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO_POR_PROVEEDOR
 
 from fastapi import Response
 from sqlalchemy import null, select
@@ -142,3 +142,22 @@ def listarCantidadIncidenciasPorTipo(filtro: ListarIncidenciasPorTipoIn):
     for resultado in resultados: 
         lista_incidencias.append(IncidenciaPorTipoOut(nombre=resultado["nombre"], cant=int(resultado["cant"])))
     return ListarIncidenciasPorTipoOut(listaIncidencias=lista_incidencias)
+
+
+def listarCantidadIncidenciasPorcentajeProveedor(filtro: ListarIncidenciasProveedorIn):
+    filtro_dict = filtro.dict()
+    fecha_inicio_str = "'" +  datetime.datetime.strptime(filtro_dict['fechaInicio'], "%d/%m/%Y").strftime("%Y-%m-%d") + "'" if filtro_dict['fechaInicio'] is not None else "NULL"
+    fecha_fin_str = "'" +  datetime.datetime.strptime(filtro_dict['fechaFin'], "%d/%m/%Y").strftime("%Y-%m-%d") + "'" if filtro_dict['fechaFin'] is not None else "NULL" 
+    cliente = "'" +  filtro_dict['cliente'] + "'" if filtro_dict['cliente'] is not None else "NULL"
+    departamento = "'" +  filtro_dict['departamento'] + "'" if filtro_dict['departamento'] is not None else "NULL" 
+    proveedor = "'" +  filtro_dict['proveedor'] + "'" if filtro_dict['proveedor'] is not None else "NULL" 
+    query_cantidades_text = QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO.format(fecha_inicio = fecha_inicio_str, fecha_fin = fecha_fin_str, cliente = cliente,
+                                                                        departamento = departamento)
+    resultado_total = conn.execute(query_cantidades_text).fetchone()
+    print(resultado_total)
+    query_cantidades_text = QUERY_LISTAR_CANTIDAD_INCIDENCIAS_POR_FALLO_MECANICO_POR_PROVEEDOR.format(fecha_inicio = fecha_inicio_str, fecha_fin = fecha_fin_str, cliente = cliente,
+                                                                        departamento = departamento, proveedor=proveedor)
+
+    resultado_proveedor = conn.execute(query_cantidades_text).fetchone()
+    print(resultado_proveedor)
+    return ListarIncidenciasProveedorOut(porcentaje=resultado_proveedor[0]/resultado_total[0])
