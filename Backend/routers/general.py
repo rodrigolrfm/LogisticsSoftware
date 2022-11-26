@@ -255,6 +255,9 @@ async def iniciarSesion(usuarioIniciarSesionIN:UsuarioIniciarSesionIN):
 async def registrarCliente(cliente: Cliente = Body(...)):
     return registrarClienteModule(cliente)
 
+@router.post("/listarProveedores/")
+async def listarProveedores():
+    return listarProveedoresModule()
 
 @router.post("/registrarDepartamento/")
 async def registrarDepartamento(departamento: Departamento = Body(...)):

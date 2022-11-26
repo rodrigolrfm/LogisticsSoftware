@@ -21,4 +21,8 @@ def listarProveedorModule(razonSocial):
     if(proveedor == None): 
         return registrarProveedorModule(proveedor=Proveedor(razonSocial=razonSocial))
     else: 
-        return proveedor._mapping['id']   
+        return proveedor._mapping['id']
+    
+def listarProveedoresModule():
+    proveedores = conn.execute('select * from Proveedor;').fetchall()
+    return proveedores
