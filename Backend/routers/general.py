@@ -22,6 +22,14 @@ from schemas.DistritoSchema import Distrito
 from schemas.ProveedorSchema import Proveedor
 from schemas.SolicitudSchema import Solicitud
 from schemas.SolicitudSchema import SolicitudUnica
+from schemas.SolicitudSchema import ListarCantidadIncidenciasIn
+from schemas.SolicitudSchema import ListarCantidadIncidenciasOut
+from schemas.SolicitudSchema import ListarIncidenciasPorTipoIn
+from schemas.SolicitudSchema import IncidenciaPorTipoOut, ListarIncidenciasPorTipoOut
+from schemas.SolicitudSchema import ListarIncidenciasProveedorIn
+from schemas.SolicitudSchema import ListarIncidenciasProveedorOut
+from schemas.SolicitudSchema import IncidenciaMensualOut
+
 from schemas.SolicitudSchema import SolicitudListarIncidentesIN
 from schemas.UsuarioSchema import *
 import requests
@@ -910,3 +918,29 @@ async def create_upload_file(file: UploadFile | None = None):
         file.file.close()
         
         return {"Sugerencia": responseJson}
+
+@router.post("/incidencias")
+async def listar_cantidad_incidencias(filtro: ListarCantidadIncidenciasIn ):
+    return listarCantidadIncidencias(filtro)
+
+@router.post("/incidencias/mensual")
+async def listar_cantidad_incidencias_por_mes():
+    return listarCantidadIncidenciasPorMes()
+
+@router.post("/incidencias/tipoIncidencia")
+async def listar_cantidad_incidencias_por_tipo(filtro: ListarIncidenciasPorTipoIn ):
+    return listarCantidadIncidenciasPorTipo(filtro)
+
+
+@router.post("/incidencias/tipoIncidencia/proveedor")
+async def listar_cantidad_incidencias_porcentaje_proveedor(filtro: ListarIncidenciasProveedorIn ):
+    return listarCantidadIncidenciasPorcentajeProveedor(filtro)
+
+@router.post("/departamentos")
+async def listar_cantidad_departamentos():
+    return listarDepartamentosModule()
+
+
+@router.post("/clientes")
+async def listar_cantidad_clientes():
+    return listarTodosLosClientesModule()

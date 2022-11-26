@@ -1,5 +1,5 @@
 #Python
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 from datetime import datetime
 
@@ -220,6 +220,53 @@ class SolicitudUnicaRespuesta(BaseModel):
         max_length=400,
         example="Lima"
     )
+
+class ListarCantidadIncidenciasIn(BaseModel):
+    fechaInicio: Optional[str] = Field(default=None, example='21/01/2022')
+    fechaFin: Optional[str] = Field(default=None, example='21/01/2022')
+    cliente: Optional[str] = Field(default=None, example="Lima")
+    departamento: Optional[str] = Field(default=None, example="Lima")
+
+class ListarCantidadIncidenciasOut(BaseModel):
+    cantidadIncidencias:int = Field(default=None, example=1)
+    cantidadOK:int = Field(default=None, example=1)
+
+class ListarIncidenciasPorTipoIn(BaseModel):
+    fechaInicio: Optional[str] = Field(default=None, example='21/01/2022')
+    fechaFin: Optional[str] = Field(default=None, example='21/01/2022')
+    cliente: Optional[str] = Field(default=None, example="Lima")
+    departamento: Optional[str] = Field(default=None, example="Lima")
+
+class IncidenciaPorTipoOut(BaseModel): 
+    nombre: str = Field(default=None, example="Lima")
+    cant: int = Field(default=None, example=1) 
+
+class ListarIncidenciasPorTipoOut(BaseModel):
+    listaIncidencias:List[IncidenciaPorTipoOut] = Field(default=None, example=1)
+
+class ListarIncidenciasProveedorIn(BaseModel):
+    fechaInicio: Optional[str] = Field(default=None, example='21/01/2022')
+    fechaFin: Optional[str] = Field(default=None, example='21/01/2022')
+    cliente: Optional[str] = Field(default=None, example="Lima")
+    departamento: Optional[str] = Field(default=None, example="Lima")
+    proveedor: Optional[str] = Field(default=None, example="Lima")
+
+class ListarIncidenciasProveedorOut(BaseModel):
+    porcentaje:float
+
+class IncidenciaMensualOut(BaseModel): 
+    enero: str = Field(default=None, example="Lima")
+    febrero: str = Field(default=None, example="Lima")
+    marzo: str = Field(default=None, example="Lima")
+    abril: str = Field(default=None, example="Lima")
+    mayo: str = Field(default=None, example="Lima")
+    junio: str = Field(default=None, example="Lima")
+    julio: str = Field(default=None, example="Lima")
+    agosto: str = Field(default=None, example="Lima")
+    septiembre: str = Field(default=None, example="Lima")
+    octubre: str = Field(default=None, example="Lima")
+    noviembre: str = Field(default=None, example="Lima")
+    diciembre: str = Field(default=None, example="Lima")
     
     
 class SolicitudListarIncidentesIN(BaseModel):

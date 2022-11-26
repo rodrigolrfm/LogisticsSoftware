@@ -21,3 +21,7 @@ def listarClienteModule(razonSocial):
         return registrarClienteModule(cliente=Cliente(razonSocial=razonSocial))
     else: 
         return cliente._mapping['id']   
+
+def listarTodosLosClientesModule(): 
+    resultado = conn.execute(clienteModel.select()).fetchall()
+    return resultado
