@@ -3,7 +3,7 @@ from models.Solicitud import solicitud as solicitudModel
 from models.Solicitud import solicitud as solicitudModelSelect
 from schemas.SolicitudSchema import Solicitud
 from schemas.SolicitudSchema import SolicitudUnica
-
+from schemas.SolicitudSchema import SolicitudUnicaRespuesta
 from models.Distrito import distrito as distritoModel
 from models.Provincia import provincia as provinciaModel
 from models.Departamento import departamento as departamentoModel
@@ -49,6 +49,7 @@ def obtenerSolicitud(solicitud:SolicitudUnica):
     fechaManifiestoInformado = solicitud['fechaManifiestoInformado']
     fechaManifiestoVerificado = solicitud['fechaManifiestoVerificado']
     fechaReparto = solicitud['fechaReparto']
+    tipoIncidenciaReparto = solicitud['tipoIncidenciaReparto']
     fechaIncidenciaReparto = solicitud['fechaIncidenciaReparto']
     fechaCompromiso = solicitud['fechaCompromiso']
     sugerencia = solicitud['sugerencia']
@@ -70,10 +71,10 @@ def obtenerSolicitud(solicitud:SolicitudUnica):
     clienteRes = conn.execute(clienteModel.select().where(clienteModel.c.id == idCliente)).fetchone()
     proveedorRes = conn.execute(proveedorModel.select().where(proveedorModel.c.id == idProveedor)).fetchone()
     
-    cliente = clienteRes['razonSocial']
-    proveedor  = proveedorRes['razonSocial']
+    cliente = str(clienteRes['razonSocial'])
+    proveedor  = str(proveedorRes['razonSocial'])
 
-    solicitudNuevaUnica = SolicitudUnica(
+    solicitudNuevaUnica = SolicitudUnicaRespuesta(
         guia=guia,
         estado=estado,
         fechaEntrega=fechaEntrega,
@@ -102,7 +103,7 @@ def obtenerSolicitud(solicitud:SolicitudUnica):
         distritoDestino=distritoDestino,
         provinciaDestino=provinciaDestino,
         departamentoDestino=departamentoDestino,
-        razonNombreDestinatario=" "
+        tipoIncidenciaReparto=tipoIncidenciaReparto,
     )    
     
     return solicitudNuevaUnica
