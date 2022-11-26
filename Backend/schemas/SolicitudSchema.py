@@ -155,12 +155,6 @@ class SolicitudUnicaRespuesta(BaseModel):
         max_length=100,
         example="Lima"
     )
-    razonNombreDestinatario: Optional[str] = Field(
-        ...,
-        min_length=1,
-        max_length=100,
-        example="Lima"
-    )
     primeraDireccion: Optional[str] = Field(
         ...,
         min_length=1,
@@ -220,18 +214,6 @@ class SolicitudUnicaRespuesta(BaseModel):
     )
     fechaIncidenciaReparto: datetime = Field(default=None, example='2032-04-23T10:20:30.400+02:30')
     fechaCompromiso: datetime = Field(default=None, example='2032-04-23T10:20:30.400+02:30')
-    clima: Optional[str] = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-        example="Lima"
-    )
-    temperatura: Optional[float]
-    humedad: Optional[float]
-    indiceCriminalidad: Optional[float]
-    cantAccidentesTransito :Optional[int] = Field(default=None, example=1)
-    cantPEA :Optional[int] = Field(default=None, example=1)
-    cantFenoNatural :Optional[int] = Field(default=None, example=1)
     sugerencia: Optional[str] = Field(
         ...,
         min_length=1,
