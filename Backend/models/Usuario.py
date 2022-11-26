@@ -8,6 +8,7 @@ usuario = Table(
     meta,
     Column("id", Integer, primary_key=True),
     Column("nombreUsuario", String(50)),
+    Column("password", String(50)),
     Column("nombres", String(100)),
     Column("apellidos", String(100))
 )

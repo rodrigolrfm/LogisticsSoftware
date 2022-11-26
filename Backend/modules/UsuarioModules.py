@@ -14,3 +14,7 @@ def registrarUsuarioModule(usuario:Usuario):
     nuevoUsuario = usuario.dict()
     resultado = conn.execute(usuarioModel.insert().values(nuevoUsuario))
     return resultado.lastrowid
+
+
+def loguearse():
+    return 1

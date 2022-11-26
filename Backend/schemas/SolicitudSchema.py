@@ -267,3 +267,31 @@ class IncidenciaMensualOut(BaseModel):
     octubre: str = Field(default=None, example="Lima")
     noviembre: str = Field(default=None, example="Lima")
     diciembre: str = Field(default=None, example="Lima")
+    
+    
+class SolicitudListarIncidentesIN(BaseModel):
+    fechaInicio: Optional[str] = Field(default=None, example="21/01/2022")
+    fechaFin: Optional[str] = Field(default=None, example="21/01/2022")
+    cliente: Optional[str] = Field(default=None, example="Lima")
+    departamento: Optional[str] = Field(default=None, example="Lima")
+    tipoIncidencia:  Optional[str] = Field(default=None, example="Lima")
+    numGuia:  Optional[str] = Field(default=None, example="ASAD123")
+    
+    
+class SolicitudListarIncidentesOUT(BaseModel):
+    guia: Optional[str] = Field(
+        ...,
+        min_length=1,
+        max_length=25,
+        example="Lima"
+    )
+    fechaCompromiso: datetime = Field(default=None, example='21/01/2022')
+    fechaEntrega: datetime = Field(default=None, example='21/01/2022')
+    numeroPaquete:Optional[int] = Field(default=None, example=1)
+    cliente: Optional[str] = Field(default=None, example="Lima")
+    estado: Optional[str] = Field(
+        ...,
+        min_length=1,
+        max_length=100,
+        example="Lima"
+    )
