@@ -920,5 +920,10 @@ async def listar_cantidad_incidencias(filtro: ListarCantidadIncidenciasIn ):
 
 
 @router.post("/departamentos")
-async def listar_cantidad_incidencias():
+async def listar_cantidad_departamentos():
     return listarDepartamentosModule()
+
+
+@router.post("/clientes")
+async def listar_cantidad_clientes():
+    return listarTodosLosClientesModule()
