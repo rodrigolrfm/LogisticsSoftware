@@ -22,6 +22,14 @@ from schemas.DistritoSchema import Distrito
 from schemas.ProveedorSchema import Proveedor
 from schemas.SolicitudSchema import Solicitud
 from schemas.SolicitudSchema import SolicitudUnica
+from schemas.SolicitudSchema import ListarCantidadIncidenciasIn
+from schemas.SolicitudSchema import ListarCantidadIncidenciasOut
+from schemas.SolicitudSchema import ListarIncidenciasPorTipoIn
+from schemas.SolicitudSchema import IncidenciaPorTipoOut, ListarIncidenciasPorTipoOut
+from schemas.SolicitudSchema import ListarIncidenciasProveedorIn
+from schemas.SolicitudSchema import ListarIncidenciasProveedorOut
+from schemas.SolicitudSchema import IncidenciaMensualOut
+
 from schemas.UsuarioSchema import Usuario
 import requests
 import csv
@@ -905,3 +913,9 @@ async def create_upload_file(file: UploadFile | None = None):
         file.file.close()
         
         return {"Sugerencia": responseJson}
+
+@router.post("/incidencias")
+async def listar_cantidad_incidencias(filtro: ListarCantidadIncidenciasIn ):
+    return listarCantidadIncidencias(filtro)
+
+

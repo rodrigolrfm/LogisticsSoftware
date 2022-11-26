@@ -3,20 +3,27 @@ from models.Solicitud import solicitud as solicitudModel
 from models.Solicitud import solicitud as solicitudModelSelect
 from schemas.SolicitudSchema import Solicitud
 from schemas.SolicitudSchema import SolicitudUnica
+from schemas.SolicitudSchema import ListarCantidadIncidenciasIn
+from schemas.SolicitudSchema import ListarCantidadIncidenciasOut
+from schemas.SolicitudSchema import ListarIncidenciasPorTipoIn
+from schemas.SolicitudSchema import IncidenciaPorTipoOut, ListarIncidenciasPorTipoOut
+from schemas.SolicitudSchema import ListarIncidenciasProveedorIn
+from schemas.SolicitudSchema import ListarIncidenciasProveedorOut
+from schemas.SolicitudSchema import IncidenciaMensualOut
 from schemas.SolicitudSchema import SolicitudUnicaRespuesta
 from models.Distrito import distrito as distritoModel
 from models.Provincia import provincia as provinciaModel
 from models.Departamento import departamento as departamentoModel
 from models.Cliente import cliente as clienteModel
 from models.Proveedor import proveedor as proveedorModel
-
+from utils.queries_sql import QUERY_LISTAR_CANTIDAD_INCIDENCIAS
 
 from fastapi import Response
 from sqlalchemy import null, select
 from starlette.status import HTTP_200_OK
 from cryptography.fernet import Fernet
 from hashlib import pbkdf2_hmac
-from datetime import datetime
+import datetime
 
 
 
@@ -107,3 +114,16 @@ def obtenerSolicitud(solicitud:SolicitudUnica):
     )    
     
     return solicitudNuevaUnica
+
+
+def listarCantidadIncidencias(filtro: ListarCantidadIncidenciasIn):
+    filtro_dict = filtro.dict()
+    fecha_inicio_str = "'" +  datetime.datetime.strptime(filtro_dict['fechaInicio'], "%d/%m/%Y").strftime("%Y-%m-%d") + "'" if filtro_dict['fechaInicio'] is not None else "NULL"
+    fecha_fin_str = "'" +  datetime.datetime.strptime(filtro_dict['fechaFin'], "%d/%m/%Y").strftime("%Y-%m-%d") + "'" if filtro_dict['fechaFin'] is not None else "NULL" 
+    cliente = "'" +  filtro_dict['cliente'] + "'" if filtro_dict['cliente'] is not None else "NULL"
+    departamento = "'" +  filtro_dict['departamento'] + "'" if filtro_dict['departamento'] is not None else "NULL" 
+    query_cantidades_text = QUERY_LISTAR_CANTIDAD_INCIDENCIAS.format(fecha_inicio = fecha_inicio_str, fecha_fin = fecha_fin_str, cliente = cliente,
+                                                                        departamento = departamento)
+    resultado = conn.execute(query_cantidades_text).fetchone()
+    return ListarCantidadIncidenciasOut(cantidadIncidencias=resultado["cantidadIncidencias"] if resultado["cantidadIncidencias"] is not None else 0, 
+                                        cantidadOK=resultado["cantidadOK"]if resultado["cantidadOK"] is not None else 0)
