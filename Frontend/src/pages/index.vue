@@ -137,11 +137,11 @@ export default {
         this.departamentoTexto=this.obtenerNombreDepartamentoPorID(this.departamento);
         this.clienteTexto=this.obtenerNombreClientePorID(this.cliente);
         console.log(this.departamentoTexto,this.clienteTexto);
-        /*let data=await getCantidadIncidencias(this.fechaInicio,this.fechaFin,this.cliente,this.departamento);
+        let data=await getCantidadIncidencias(this.fechaInicio,this.fechaFin,this.cliente,this.departamento);
         let data1=await getIncidenciasMensual();
         console.log(data);
-        console.log(data1);*/
-        let data={
+        console.log(data1);
+        /*let data={
           cantidadIncidencias:123,
           CantidadOK:34,
         };
@@ -158,22 +158,22 @@ export default {
           octubre:12,
           noviembre:0,
           diciembre:10,
-        }
+        }*/
         if(true){//data.status=="success"
-          this.seriesDonut[0]=data.cantidadIncidencias-data.CantidadOK;
-          this.seriesDonut[1]=data.CantidadOK;
-          this.seriesBar[0].data[0]=data1.enero;
-          this.seriesBar[0].data[1]=data1.febrero;
-          this.seriesBar[0].data[2]=data1.marzo;
-          this.seriesBar[0].data[3]=data1.abril;
-          this.seriesBar[0].data[4]=data1.mayo;
-          this.seriesBar[0].data[5]=data1.junio;
-          this.seriesBar[0].data[6]=data1.julio;
-          this.seriesBar[0].data[7]=data1.agosto;
-          this.seriesBar[0].data[8]=data1.septiembre;
-          this.seriesBar[0].data[9]=data1.octubre;
-          this.seriesBar[0].data[10]=data1.noviembre;
-          this.seriesBar[0].data[11]=data1.diciembre;
+          this.seriesDonut[0]=data.data.cantidadIncidencias-data.data.cantidadOK;
+          this.seriesDonut[1]=data.data.cantidadOK+1;
+          this.seriesBar[0].data[0]=data1.data.enero;
+          this.seriesBar[0].data[1]=data1.data.febrero;
+          this.seriesBar[0].data[2]=data1.data.marzo;
+          this.seriesBar[0].data[3]=data1.data.abril;
+          this.seriesBar[0].data[4]=data1.data.mayo;
+          this.seriesBar[0].data[5]=data1.data.junio;
+          this.seriesBar[0].data[6]=data1.data.julio;
+          this.seriesBar[0].data[7]=data1.data.agosto;
+          this.seriesBar[0].data[8]=data1.data.septiembre;
+          this.seriesBar[0].data[9]=data1.data.octubre;
+          this.seriesBar[0].data[10]=data1.data.noviembre;
+          this.seriesBar[0].data[11]=data1.data.diciembre;
         }else{
           
         }
@@ -228,9 +228,9 @@ export default {
     },
     async obtenerDepartamentos(){
       try{
-        /*let data=await getDepartamentos();
-        console.log(data);*/
-        let data=[
+        let data=await getDepartamentos();
+        console.log(data);
+        /*let data=[
           {
             id:1,
             nombreDepartamento:"CAJAMARCA",
@@ -239,12 +239,12 @@ export default {
             id:2,
             nombreDepartamento:"LA LIBERTAD",
           },
-        ];
+        ];*/
         if(true){//data.data.status=="success"
-          for(let i=0;i<data.length;i++){
+          for(let i=0;i<data.data.length;i++){
             this.opcionesDepartamento.push({
-              value:data[i].id,
-              label:data[i].nombreDepartamento,
+              value:data.data[i].id,
+              label:data.data[i].nombreDepartamento,
             });
           }
         }
@@ -254,9 +254,9 @@ export default {
     },
     async obtenerClientes(){
       try{
-        /*let data=await getClientes();
-        console.log(data);*/
-        let data=[
+        let data=await getClientes();
+        console.log(data)
+        /*let data=[
           {
             id:1,
             razonSocial:"SWISSJUST LATINOAMERICA S.A. SUCURSAL PERU",
@@ -265,12 +265,14 @@ export default {
             id:2,
             razonSocial:"DINET S.A.",
           },
-        ];
+        ];*/
         if(true){//data.data.status=="success"
-          for(let i=0;i<data.length;i++){
+          for(let i=0;i<data.data.length;i++){
+            console.log(data.data)
+            console.log(data.data[0].id)
             this.opcionesClientes.push({
-              value:data[i].id,
-              label:data[i].razonSocial,
+              value:data.data[i].id,
+              label:data.data[i].razonSocial,
             });
           }
         }

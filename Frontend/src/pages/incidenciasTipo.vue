@@ -105,13 +105,13 @@
       },
       async cambioProveedor(value){
         console.log(value);
-        /*let data=await getPorcentajeProveedor(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto,this.proveedor);
-        console.log(data);*/
-        let data1={
+        let data=await getPorcentajeProveedor(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto,this.proveedor);
+        console.log(data);
+        /*let data1={
           porcentaje:11,
-        }
+        }*/
         if(true){//data.data.status=="success"
-          this.porcentajeProveedor=data1.porcentaje.toString()+"%";
+          this.porcentajeProveedor=data.porcentaje.toString()+"%";
         }
       },
     },
@@ -123,11 +123,11 @@
       this.clienteTexto=sessionStorage.clienteIncidenciaTexto;
       this.departamentoTexto=sessionStorage.departamentoIncidenciaTexto;
       try{
-        /*let data=await getIncidenciasPorTipo(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto);
+        let data=await getIncidenciasPorTipo(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto);
         console.log(data);
         let data2=await getProveedores();
-        console.log(data2);*/
-        let data={
+        console.log(data2);
+        /*let data={
           listaIncidencias:[
             {
               nombre:"Incidencia Tipo 1",
@@ -148,7 +148,7 @@
             id:2,
             proveedor:"Proveedor 2",
           },
-        ];
+        ];*/
         if(true){//data.status==success
           this.optionsDonut.labels=[];
           this.seriesDonut=[];

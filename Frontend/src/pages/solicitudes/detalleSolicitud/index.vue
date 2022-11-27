@@ -152,9 +152,9 @@ export default {
     async obtenerDetalleSolicitud(){
       console.log(this.guia);
       try{
-        /*let data=await getDetalleSolicitud(this.guia);
-        console.log(data);*/
-        let data={
+        let data=await getDetalleSolicitud(this.guia);
+        console.log(data);
+        /*let data={
             guia: "SW093885",
             estado: "Entregada",
             fechaEntrega: "2022-04-21T00:00:00",
@@ -184,7 +184,7 @@ export default {
             fechaIncidenciaReparto: "2022-04-21T00:00:00",
             fechaCompromiso: "2022-04-20T00:00:00",
             sugerencia: "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE SWISSJUST LATINOAMERICA S.A. SUCURSAL PERU DEBE REFORZAR LA FUNCIÓN DE REGISTRAR CORRECTAMENTE LA DIRECCION DE DESTINO YA QUE EL INCIDENTE OBSEVADO SE DEBE A DIRECCION INCOMPLETA"
-        }
+        }*/
         if(true){//data.data.status=="sucess"
             this.guia=data.guia;
             this.estado=data.estado;

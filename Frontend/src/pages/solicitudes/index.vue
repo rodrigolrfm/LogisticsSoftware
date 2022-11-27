@@ -102,9 +102,9 @@ export default {
       this.data=[];
       console.log(this.fechaInicio,this.fechaFin,this.tipoIncidencia);
       try{
-        /*let data=await getListaSolicitud(this.fechaInicio,this.fechaFin,this.tipoIncidencia);
-        console.log(data);*/
-        let data=[
+        let data=await getListaSolicitud(this.fechaInicio,this.fechaFin,this.tipoIncidencia);
+        console.log(data);
+        /*let data=[
           {
             guia: "SW093885",
             fechaCompromiso: "2022-04-20T00:00:00",
@@ -121,7 +121,7 @@ export default {
             cliente: "SWISSJUST SUCURSAL BRASIL",
             estado: "En proceso"
           },
-        ];
+        ];*/
         if(true){//data.data.status=="success"
           for(let i=0;i<data.length;i++){
             let keyI=(i+1).toString();
