@@ -53,6 +53,8 @@ export default {
       fechaInicio:'',
       fechaFin:'',
       tipoIncidencia:'',
+      clienteTexto:'',
+      departamentoTexto:'',
       dataSolicitudes: [],
 
       columnas: [
@@ -78,8 +80,8 @@ export default {
         },
         {
           title: 'Cantidad Paquetes',
-          dataIndex: 'cantidadPaquetes',
-          key: 'cantidadPaquetes',
+          dataIndex: 'numeroPaquete',
+          key: 'numeroPaquete',
         },
         {
           title: 'Estado',
@@ -123,18 +125,18 @@ export default {
           },
         ];*/
         if(true){//data.data.status=="success"
-          for(let i=0;i<data.length;i++){
+          for(let i=0;i<data.data.length;i++){
             let keyI=(i+1).toString();
-            let fechaCompromisoFormato=data[i].fechaCompromiso.substring(0,10);
-            let fechaEntregaFormato=data[i].fechaEntrega.substring(0,10);
+            let fechaCompromisoFormato=data.data[i].fechaCompromiso.substring(0,10);
+            let fechaEntregaFormato=data.data[i].fechaEntrega.substring(0,10);
             let itemListaSolicitud={
               key:keyI,
-              guia:data[i].guia,
+              guia:data.data[i].guia,
               fechaCompromiso:fechaCompromisoFormato,
               fechaEntrega:fechaEntregaFormato,
-              cantidadPaquetes:data[i].numeroPaquete,
-              cliente:data[i].cliente,
-              estado:data[i].estado,
+              numeroPaquete:data.data[i].numeroPaquete,
+              cliente:data.data[i].cliente,
+              estado:data.data[i].estado,
             };
             this.dataSolicitudes.push(itemListaSolicitud);
           }
@@ -148,6 +150,8 @@ export default {
     this.fechaInicio=sessionStorage.fechaInicioIncidencia;
     this.fechaFin=sessionStorage.fechaFinIncidencia;
     this.tipoIncidencia=sessionStorage.tipoIncidenciaTexto;
+    this.tipoIncidencia=sessionStorage.tipoIncidenciaTexto;
+    this.clienteTexto=sessionStorage.clienteIncidenciaTexto;
     await this.obtenerListaSolicitud();
   },
 }

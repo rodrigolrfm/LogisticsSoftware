@@ -137,7 +137,7 @@ export default {
         this.departamentoTexto=this.obtenerNombreDepartamentoPorID(this.departamento);
         this.clienteTexto=this.obtenerNombreClientePorID(this.cliente);
         console.log(this.departamentoTexto,this.clienteTexto);
-        let data=await getCantidadIncidencias(this.fechaInicio,this.fechaFin,this.cliente,this.departamento);
+        let data=await getCantidadIncidencias(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto);
         let data1=await getIncidenciasMensual();
         console.log(data);
         console.log(data1);
@@ -161,7 +161,7 @@ export default {
         }*/
         if(true){//data.status=="success"
           this.seriesDonut[0]=data.data.cantidadIncidencias-data.data.cantidadOK;
-          this.seriesDonut[1]=data.data.cantidadOK+1;
+          this.seriesDonut[1]=data.data.cantidadOK;
           this.seriesBar[0].data[0]=data1.data.enero;
           this.seriesBar[0].data[1]=data1.data.febrero;
           this.seriesBar[0].data[2]=data1.data.marzo;
@@ -208,6 +208,8 @@ export default {
       sessionStorage.setItem('departamentoIncidenciaID',this.departamento);
       sessionStorage.setItem('clienteIncidenciaTexto',this.clienteTexto);
       sessionStorage.setItem('departamentoIncidenciaTexto',this.departamentoTexto);
+      sessionStorage.setItem('opcionesClientes',JSON.stringify(this.opcionesClientes));
+      sessionStorage.setItem('opcionesDepartamentos',JSON.stringify(this.opcionesDepartamento));
       this.$router.push({
         name:"incidenciasTipo",
         /*params:{

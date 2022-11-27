@@ -195,8 +195,8 @@ def obtenerListaSolicitudModule(solicitud:SolicitudListarIncidentesIN):
     nombreTipoIncidencia = nuevoSolicitud['tipoIncidencia']
     solicitudGuia = nuevoSolicitud['numGuia']
     
-    datetime_object_inicio = datetime.strptime(fechaInicio, '%d/%m/%Y')
-    datetime_object_fin = datetime.strptime(fechaFin, '%d/%m/%Y')
+    datetime_object_inicio = datetime.datetime.strptime(fechaInicio, '%d/%m/%Y')
+    datetime_object_fin = datetime.datetime.strptime(fechaFin, '%d/%m/%Y')
     
     num_guia = solicitudGuia if solicitudGuia is not None else "NULL"
     num_guia_null = "'" + solicitudGuia + "'" if solicitudGuia is not None else "NULL"

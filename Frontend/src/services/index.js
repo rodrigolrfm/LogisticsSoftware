@@ -16,12 +16,36 @@ export function getCantidadIncidencias(fechaInicio,fechaFin,cliente,departamento
     console.log(fechaFin);
     console.log(cliente);
     console.log(departamento);
-    return axios.post(URL+"/general/incidencias",{
-        "fechaInicio":fechaInicio,
-        "fechaFin":fechaFin,
-        "cliente":cliente,
-        "departamento":departamento,
-    });
+
+    if (cliente == ' - ' && departamento == ' - '){
+        return axios.post(URL+"/general/incidencias",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+        });
+    }
+    else if (departamento == ' - ' &&  cliente != ' - '){
+        return axios.post(URL+"/general/incidencias",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "cliente":cliente,
+        });
+    }
+    else if (departamento != ' - ' &&  cliente == ' - '){
+        return axios.post(URL+"/general/incidencias",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "departamento":departamento,
+        });
+    }
+    else if (departamento != ' - ' &&  cliente != ' - '){
+        return axios.post(URL+"/general/incidencias",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "cliente":cliente,
+            "departamento":departamento,
+        });
+    }
+
 }
 
 export function getIncidenciasPorTipo(fechaInicio,fechaFin,cliente,departamento){
@@ -30,12 +54,34 @@ export function getIncidenciasPorTipo(fechaInicio,fechaFin,cliente,departamento)
     console.log(fechaFin);
     console.log(cliente);
     console.log(departamento);
-    return axios.post(URL+"/incidencias/tipoIncidencia",{
-        "fechaInicio":fechaInicio,
-        "fechaFin":fechaFin,
-        "cliente":cliente,
-        "departamento":departamento,
-    });
+    if (cliente == '' && departamento == ''){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+        });
+    }
+    if (departamento == '' &&  cliente != ''){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "cliente":cliente,
+        });
+    }
+    if (departamento != '' &&  cliente == ''){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "departamento":departamento,
+        });
+    }
+    if (departamento != '' &&  cliente != ''){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "cliente":cliente,
+            "departamento":departamento,
+        });
+    }
 }
 
 export function getIncidenciasMensual(){
@@ -45,21 +91,47 @@ export function getIncidenciasMensual(){
 }
 
 export function getPorcentajeProveedor(fechaInicio,fechaFin,cliente,departamento,proveedor){
-    return axios.post(URL+"/incidencias/tipoIncidencia/proveedor",{
+    console.log(proveedor)
+    if (cliente == ' - ' && departamento == ' - '){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia/proveedor",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "proveedor":proveedor,
+        });
+    }
+    else if (departamento == ' - ' &&  cliente != ' - '){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia/proveedor",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "cliente":cliente,
+            "proveedor":proveedor,
+        });
+    }
+    else if (departamento != ' - ' &&  cliente == ' - '){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia/proveedor",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "departamento":departamento,
+            "proveedor":proveedor,
+        });
+    }
+    else if (departamento != ' - ' &&  cliente != ' - '){
+        return axios.post(URL+"/general/incidencias/tipoIncidencia/proveedor",{
+            "fechaInicio":fechaInicio,
+            "fechaFin":fechaFin,
+            "cliente":cliente,
+            "departamento":departamento,
+            "proveedor":proveedor,
+        });
+    }
+}
+
+export function getListaSolicitud(fechaInicio,fechaFin,tipoIncidencia,cliente,departamento){
+    return axios.post(URL+"/general/obtenerListaSolicitud",{
         "fechaInicio":fechaInicio,
         "fechaFin":fechaFin,
         "cliente":cliente,
         "departamento":departamento,
-        "proveedor":proveedor,
-    });
-}
-
-export function getListaSolicitud(fechaInicio,fechaFin,tipoIncidencia){
-    return axios.post(URL+"/general/obtenerListaSolicitud",{
-        "fechaInicio":fechaInicio,
-        "fechaFin":fechaFin,
-        "cliente":"",
-        "departamento":"",
         "tipoIncidencia":tipoIncidencia,
         "numGuia":"",
     });
@@ -84,7 +156,7 @@ export function getClientes(){
 }
 
 export function getProveedores(){
-    return axios.post(URL+"/general/proveedores",{
+    return axios.post(URL+"/general/listarProveedores",{
 
     });
 }
