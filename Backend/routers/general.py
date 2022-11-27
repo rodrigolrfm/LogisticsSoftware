@@ -893,29 +893,78 @@ async def create_upload_file(file: UploadFile | None = None):
         
         j = 0
         for i in dataResponse.index:
+            nombre_distrito_origen = dataResponse.loc[i,"ORIGEN"]
+            nombre_distrito_destino = dataResponse.loc[i,"DESTINO"] 
+            cliente_r = dataResponse.loc[i,"CLIENTE"]
+            proveedor_r = dataResponse.loc[i,"PROVEEDOR DE TRANSPORTE"]
+            idDistritoOrigen = listarDistritoModule(nombre=nombre_distrito_origen)
+            idDistritoDestino = listarDistritoModule(nombre=nombre_distrito_destino)
+            idCliente = listarClienteModule(razonSocial=cliente_r)
+            idProveedor = listarProveedorModule(razonSocial=proveedor_r)
+            
             valPrediction = predictions[j]
             sugerenciaPred = list(dictionarySugerencias.keys())[list(dictionarySugerencias.values()).index(predictions[j])]
             if (valPrediction==3):
-                stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(clientes[j]),str(distritos[j]),str(provincias[j]),str(departamentosnew[j]),sugerenciaPred)
+                stringResponse = "PARA LAS PRÓXIMAS SOLICITUDES DEL CLIENTE {} CON DESTINO AL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} ES NECESARIO {}".format(str(clientes[i]),str(distritos[i]),str(provincias[i]),str(departamentosnew[i]),sugerenciaPred)
             elif (valPrediction==0):
-                stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {} YA QUE EL INCIDENTE OBSEVADO SE DEBE A {}".format(str(clientes[j]),sugerenciaPred,str(incidencias[j]))
+                stringResponse = "JUSTIFICAR INCUMPLIMIENTO. EL CLIENTE {} DEBE REFORZAR LA FUNCIÓN DE {} YA QUE EL INCIDENTE OBSEVADO SE DEBE A {}".format(str(clientes[i]),sugerenciaPred,str(incidencias[i]))
             elif (valPrediction==1):
-                stringResponse = "{} PARA COMPLEMENTAR LAS SOLICITUDES EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distritos[j]),str(provincias[j]),str(departamentosnew[j]))
+                stringResponse = "{} PARA COMPLEMENTAR LAS SOLICITUDES EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distritos[i]),str(provincias[i]),str(departamentosnew[i]))
             elif (valPrediction==4):
                 stringResponse = "JUSTICIAR INCUMPLIMIENTO. PARA LAS PRÓXIMAS SOLICITUDES SE SUGIERE COORDINAR CON EL DESTINATARIO 'X' POR LA MODIFICACIÓN DE SU DIRECCIÓN"
             elif (valPrediction==2):
                 #climas
-                stringResponse = "{} EN EL DISTRITO DE {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} POR LOS PROBLEMAS CLIMÁTICOS O SOCIALES".format(sugerenciaPred,str(distritos[j]),str(provincias[j]),str(departamentosnew[j]))
+                stringResponse = "{} EN EL DISTRITO DE {} DE LA PROVINCIA {} DEL DEPARTAMENTO {} POR LOS PROBLEMAS CLIMÁTICOS O SOCIALES".format(sugerenciaPred,str(distritos[i]),str(provincias[i]),str(departamentosnew[i]))
             elif (valPrediction==5):
-                stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distritos[j]),str(provincias[j]),str(departamentosnew[j]))
+                stringResponse = "DEBIDO A PROBLEMAS DE ACCESIBILIDAD A LA ZONA O ALTO ÍNDICE DE ROBO SE SUGIERE {} EN EL DISTRITO {} DE LA PROVINCIA {} DEL DEPARTAMENTO {}".format(sugerenciaPred,str(distritos[i]),str(provincias[i]),str(departamentosnew[i]))
             elif (valPrediction==6):
                 # Incidencia del proveedor
-                stringResponse = sugerenciaPred + " " + str(proveedores[j])
+                stringResponse = sugerenciaPred + " " + str(proveedores[i])
             elif (valPrediction==7):
                 # Caso OK
-                stringResponse = sugerenciaPred
+                stringResponse = sugerenciaPred            
+            fecha_embarque_r = None if math.isnan(dataResponse.loc[i,"FECHA_EMBARQUE"]) else datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_EMBARQUE"]),'%d/%m/%Y')
+            fecha_salida_proyectada_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_SALIDA_PROYECT"]),'%d/%m/%Y')
+            fecha_llegada_proyectada_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_LLEGADA_PROYECT"]),'%d/%m/%Y')
+            fecha_llegada_real_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_LLEGADA_REAL"]) ,'%d/%m/%Y')
+            via_r = dataResponse.loc[i,"VIA"]
+            
+            cant_fen_nat = dataResponse.loc[i,"CANT_FENO_NAT"]
+            cant_acc_trans = dataResponse.loc[i,"CANT_ACC_TRANSITO"]
+            
+            fecha_manifiesto_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_MANIFIESTO"]),'%d/%m/%Y')
+            estado_manifiesto_r = dataResponse.loc[i,"ESTADO_MANIFIESTO"]
+            incidencia_manifiesto_r = None if (dataResponse.loc[i,"INCIDENCIA_MANIFIESTO"]=='') else dataResponse.loc[i,"INCIDENCIA_MANIFIESTO"]
+            fecha_manifiesto_recogido_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA MANIFIESTO_RECOGIDO"]),'%d/%m/%Y')
+            fecha_manifiesto_informado_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA MANIFIESTO_INFORMADO"]),'%d/%m/%Y')
+            fecha_manifiesto_verificado_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA MANIFIESTO_VERIFICADO"]),'%d/%m/%Y')
+            fecha_reparto_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA REPARTO"]),'%d/%m/%Y')
+            tipo_incidencia_reparto_r = dataResponse.loc[i,"TIPO_INCIDENCIA_REPARTO"]
+            #print("++**")
+            #print(type(dataResponse.loc[i,"FECHA_INCIDENCIA_REPARTO"]))
+            #print(dataResponse.loc[i,"FECHA_INCIDENCIA_REPARTO"])
+            fecha_incidencia_reparto_r =  None 
+            try:
+                fecha_incidencia_reparto_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_INCIDENCIA_REPARTO"]),'%d/%m/%Y')
+            except:
+                fecha_incidencia_reparto_r =  None
+            
+            fecha_compromiso_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_COMPROMISO"]),'%d/%m/%Y')
+            servicio_r = str(dataResponse.loc[i,"SERVICIO"])
+            
+            solicitud = Solicitud(guia=dataResponse.loc[i,"GUIA"],estado=dataResponse.loc[i,"ESTADO_GUIA"],razonNombreDestinatario="", fechaEntrega=datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_ENTREGA"]) ,'%d/%m/%Y'), servicio=servicio_r, idDistritoOrigen=idDistritoOrigen,
+                                numeroPaquete=dataResponse.loc[i,"PAQUETES"] , contadorVisitas=dataResponse.loc[i,"CONTADOR_VISITAS"] , idDistritoDestino=idDistritoDestino,
+                                primeraDireccion=dataResponse.loc[i,"DIRECCION1"], segundaDireccion=dataResponse.loc[i,"DIRECCION2"], fechaEmbarque=fecha_embarque_r,
+                                fechaSalidaProyectada=fecha_salida_proyectada_r, fechaLlegadaProyectada=fecha_llegada_proyectada_r,
+                                fechaLlegadaReal=fecha_llegada_real_r, via=via_r, idCliente=idCliente, idProveedor=idProveedor, fechaManifiesto=fecha_manifiesto_r,
+                                estadoManifiesto=estado_manifiesto_r, incidenciaManifiesto=incidencia_manifiesto_r, fechaManifiestoRecogido=fecha_manifiesto_recogido_r,
+                                fechaManifiestoInformado=fecha_manifiesto_informado_r, fechaManifiestoVerificado=fecha_manifiesto_verificado_r, fechaReparto=fecha_reparto_r,
+                                tipoIncidenciaReparto=tipo_incidencia_reparto_r, fechaIncidenciaReparto=fecha_incidencia_reparto_r, fechaCompromiso=fecha_compromiso_r,
+                                clima=clima, temperatura=temperatura, humedad=humedad, cantAccidentesTransito=cant_acc_trans, cantFenoNatural=cant_fen_nat, 
+                                cantPEA=dataResponse.loc[i,"CANT_PEA"] ,indiceCriminalidad=dataResponse.loc[i,"INDICE_DELITOS"], sugerencia=stringResponse)
+            registrarSolicitudModule(solicitud)
             j=j+1
-            dataResponse.loc[i,"SUGERENCIAS_STR"] = stringResponse
+            dataResponse.loc[i,"SUGERENCIAS_STR"] = stringResponse         
         
         responseJson = dataResponse.to_json(orient='split')
         print(responseJson)
