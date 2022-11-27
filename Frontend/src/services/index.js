@@ -16,7 +16,7 @@ export function getCantidadIncidencias(fechaInicio,fechaFin,cliente,departamento
     console.log(fechaFin);
     console.log(cliente);
     console.log(departamento);
-    return axios.post(URL+"/incidencias",{
+    return axios.post(URL+"/general/incidencias",{
         "fechaInicio":fechaInicio,
         "fechaFin":fechaFin,
         "cliente":cliente,
@@ -39,14 +39,52 @@ export function getIncidenciasPorTipo(fechaInicio,fechaFin,cliente,departamento)
 }
 
 export function getIncidenciasMensual(){
-    return axios.post(URL+"/incidencias/mensual",{
+    return axios.post(URL+"/general/incidencias/mensual",{
 
     });
 }
 
-export function getPorcentajeProveedor(fechaInicio,fechaFin){
+export function getPorcentajeProveedor(fechaInicio,fechaFin,cliente,departamento,proveedor){
     return axios.post(URL+"/incidencias/tipoIncidencia/proveedor",{
         "fechaInicio":fechaInicio,
         "fechaFin":fechaFin,
+        "cliente":cliente,
+        "departamento":departamento,
+        "proveedor":proveedor,
+    });
+}
+
+export function getListaSolicitud(fechaInicio,fechaFin,tipoIncidencia){
+    return axios.post(URL+"/general/obtenerListaSolicitud",{
+        "fechaInicio":fechaInicio,
+        "fechaFin":fechaFin,
+        "cliente":"",
+        "departamento":"",
+        "tipoIncidencia":tipoIncidencia,
+        "numGuia":"",
+    });
+}
+
+export function getDetalleSolicitud(guia){
+    return axios.post(URL+"/general/obtenerSolicitud",{
+        "guia":guia,
+    });
+}
+
+export function getDepartamentos(){
+    return axios.post(URL+"/general/departamentos",{
+
+    });
+}
+
+export function getClientes(){
+    return axios.post(URL+"/general/clientes",{
+
+    });
+}
+
+export function getProveedores(){
+    return axios.post(URL+"/general/proveedores",{
+
     });
 }

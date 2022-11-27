@@ -19,11 +19,11 @@
           </a-col>
           <a-col :span="5">
             <p>Cliente:</p>
-            <p>{{cliente}}</p>
+            <p>{{clienteTexto}}</p>
           </a-col>
           <a-col :span="4">
             <p>Departamento:</p>
-            <p>{{departamento}}</p>
+            <p>{{departamentoTexto}}</p>
           </a-col>
         </a-row>
         <a-row type="flex" justify="center" v-if="mostrarGraficosIncidencia">
@@ -36,11 +36,20 @@
                 type="donut"
                 :options="optionsDonut"
                 :series="seriesDonut"
+                @dataPointSelection="mostrarDatosTipoIncidencia"
             ></apexchart>
           </a-col>
           <a-col :span="10">
             <p class="donut-chart">Proveedor</p>
-            <a-input disabled :value="porcentajeProveedor" style="width: 5rem;"></a-input>
+            <span><a-select
+              v-model:value="proveedor"
+              placeholder="Proveedor"
+              style="width: 200px"
+              :options="opcionesProveedores"
+              @change="cambioProveedor"
+            >
+            </a-select>
+            <a-input disabled :value="porcentajeProveedor" style="width: 5rem;"></a-input></span>
           </a-col>
         </a-row>
       </a-breadcrumb>
@@ -49,7 +58,7 @@
   
   <script>
   import { HomeOutlined } from '@ant-design/icons-vue';
-  import {getIncidenciasPorTipo, getPorcentajeProveedor} from '../services/index';
+  import {getIncidenciasPorTipo, getPorcentajeProveedor, getProveedores} from '../services/index';
   
   export default {
     components: {
@@ -59,9 +68,15 @@
     data() {
       return {
         cliente: null,
+        clienteTexto: '',
         departamento: null,
+        departamentoTexto: '',
         fechaInicio: '',
         fechaFin: '',
+        proveedor:null,
+
+        opcionesProveedores:[],
+        opcionesTipoIncidencia:{},
 
         mostrarGraficosIncidencia:false,
         porcentajeProveedor:"12%",
@@ -80,41 +95,76 @@
       }
     },
     methods: {
-      
+      mostrarDatosTipoIncidencia(event, chartContext, config){
+        console.log(config);
+        console.log(config.dataPointIndex);
+        sessionStorage.setItem("tipoIncidenciaTexto",this.opcionesTipoIncidencia[config.dataPointIndex].nombre);
+        this.$router.push({
+          name:"solicitudes",
+        });
+      },
+      async cambioProveedor(value){
+        console.log(value);
+        /*let data=await getPorcentajeProveedor(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto,this.proveedor);
+        console.log(data);*/
+        let data1={
+          porcentaje:11,
+        }
+        if(true){//data.data.status=="success"
+          this.porcentajeProveedor=data1.porcentaje.toString()+"%";
+        }
+      },
     },
     async created(){
       this.fechaInicio=sessionStorage.fechaInicioIncidencia;
       this.fechaFin=sessionStorage.fechaFinIncidencia;
-      this.cliente=sessionStorage.clienteIncidencia;
-      this.departamento=sessionStorage.departamentoIncidencia;
+      this.cliente=sessionStorage.clienteIncidenciaID;
+      this.departamento=sessionStorage.departamentoIncidenciaID;
+      this.clienteTexto=sessionStorage.clienteIncidenciaTexto;
+      this.departamentoTexto=sessionStorage.departamentoIncidenciaTexto;
       try{
-        let data=getIncidenciasPorTipo(this.fechaInicio,this.fechaFin,this.cliente,this.departamento);
-        console.log(data)
-        let data1=getPorcentajeProveedor(this.fechaInicio,this.fechaFin);
-        console.log(data1);
-        /*let data={
+        /*let data=await getIncidenciasPorTipo(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto);
+        console.log(data);
+        let data2=await getProveedores();
+        console.log(data2);*/
+        let data={
           listaIncidencias:[
             {
-              nombreIncidencia:"Incidencia Tipo 1",
-              cantTipoIncidencia:123,
+              nombre:"Incidencia Tipo 1",
+              cantTipoIncidencia:50,
             },
             {
-              nombreIncidencia:"Incidencia Tipo 2",
+              nombre:"Incidencia Tipo 2",
               cantTipoIncidencia:121,
             }
           ]
         };
-        let data1={
-          porcentaje:16,
-        }*/
+        let data2=[
+          {
+            id:1,
+            proveedor:"Proveedor 1",
+          },
+          {
+            id:2,
+            proveedor:"Proveedor 2",
+          },
+        ];
         if(true){//data.status==success
           this.optionsDonut.labels=[];
           this.seriesDonut=[];
+          this.opcionesTipoIncidencia=data.listaIncidencias;
           for(let i=0;i<data.listaIncidencias.length;i++){
             this.optionsDonut.labels.push(data.listaIncidencias[i].nombreIncidencia + ": " + data.listaIncidencias[i].cantTipoIncidencia.toString() + " casos.");
             this.seriesDonut.push(data.listaIncidencias[i].cantTipoIncidencia);
           }
-          this.porcentajeProveedor=data1.porcentaje.toString()+"%";
+
+          for(let j=0;j<data2.length;j++){
+            this.opcionesProveedores.push({
+              value:data2[j].id,
+              label:data2[j].proveedor,
+            });
+          }
+
           setTimeout(()=>{
             this.mostrarGraficosIncidencia=true;
           },500);

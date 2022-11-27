@@ -72,8 +72,7 @@
 
 <script>
 import { HomeOutlined } from '@ant-design/icons-vue';
-import { func } from 'vue-types';
-import {getCantidadIncidencias, getIncidenciasMensual} from '../services/index';
+import {getCantidadIncidencias, getIncidenciasMensual, getDepartamentos, getClientes} from '../services/index';
 
 export default {
   components: {
@@ -83,11 +82,14 @@ export default {
   data() {
     return {
       cliente: null,
+      clienteTexto: '',
       departamento: null,
+      departamentoTexto: '',
       fechaInicio: '',
       fechaFin: '',
-      opcionesDepartamento:[{value:'Depa 1',label:'Depa 1'},{value:'Depa 2',label:'Depa 2'},{value:'Depa 3',label:'Depa 3'}],
-      opcionesClientes:[{value:'Cliente 1',label:'Cliente 1'},{value:'Cliente 2',label:'Cliente 2'},{value:'Cliente 3',label:'Cliente 3'}],
+
+      opcionesDepartamento:[],
+      opcionesClientes:[],
 
       mostrarGrafico:false,
 
@@ -131,11 +133,15 @@ export default {
   methods: {
     async mostrarGraficos(){
       try{
-        let data=await getCantidadIncidencias(this.fechaInicio,this.fechaFin,this.cliente,this.departamento);
+        console.log(this.fechaInicio,this.fechaFin,this.cliente,this.departamento);
+        this.departamentoTexto=this.obtenerNombreDepartamentoPorID(this.departamento);
+        this.clienteTexto=this.obtenerNombreClientePorID(this.cliente);
+        console.log(this.departamentoTexto,this.clienteTexto);
+        /*let data=await getCantidadIncidencias(this.fechaInicio,this.fechaFin,this.cliente,this.departamento);
         let data1=await getIncidenciasMensual();
         console.log(data);
-        console.log(data1);
-        /*let data={
+        console.log(data1);*/
+        let data={
           cantidadIncidencias:123,
           CantidadOK:34,
         };
@@ -152,7 +158,7 @@ export default {
           octubre:12,
           noviembre:0,
           diciembre:10,
-        }*/
+        }
         if(true){//data.status=="success"
           this.seriesDonut[0]=data.cantidadIncidencias-data.CantidadOK;
           this.seriesDonut[1]=data.CantidadOK;
@@ -176,14 +182,32 @@ export default {
         console.log(err);
       }
     },
+    obtenerNombreClientePorID(id){
+      for(let i=0;i<this.opcionesClientes.length;i++){
+        if(this.opcionesClientes[i].value===id){
+          return this.opcionesClientes[i].label;
+        }
+      }
+      return ' - ';
+    },
+    obtenerNombreDepartamentoPorID(id){
+      for(let i=0;i<this.opcionesDepartamento.length;i++){
+        if(this.opcionesDepartamento[i].value===id){
+          return this.opcionesDepartamento[i].label;
+        }
+      }
+      return ' - ';
+    },
     mostrarTipoIncidencia(event, chartContext, config){
       console.log("click donutchart");
       console.log(config);//config.dataPointIndex tiene el index de cual dato se presiono
       console.log(this.cliente);
       sessionStorage.setItem('fechaInicioIncidencia',this.fechaInicio);
       sessionStorage.setItem('fechaFinIncidencia',this.fechaFin);
-      sessionStorage.setItem('clienteIncidencia',this.cliente);
-      sessionStorage.setItem('departamentoIncidencia',this.departamento);
+      sessionStorage.setItem('clienteIncidenciaID',this.cliente);
+      sessionStorage.setItem('departamentoIncidenciaID',this.departamento);
+      sessionStorage.setItem('clienteIncidenciaTexto',this.clienteTexto);
+      sessionStorage.setItem('departamentoIncidenciaTexto',this.departamentoTexto);
       this.$router.push({
         name:"incidenciasTipo",
         /*params:{
@@ -202,6 +226,62 @@ export default {
       console.log(this.fechaInicio);
       console.log(this.fechaFin);
     },
+    async obtenerDepartamentos(){
+      try{
+        /*let data=await getDepartamentos();
+        console.log(data);*/
+        let data=[
+          {
+            id:1,
+            nombreDepartamento:"CAJAMARCA",
+          },
+          {
+            id:2,
+            nombreDepartamento:"LA LIBERTAD",
+          },
+        ];
+        if(true){//data.data.status=="success"
+          for(let i=0;i<data.length;i++){
+            this.opcionesDepartamento.push({
+              value:data[i].id,
+              label:data[i].nombreDepartamento,
+            });
+          }
+        }
+      }catch(err){
+        console.log(err);
+      }
+    },
+    async obtenerClientes(){
+      try{
+        /*let data=await getClientes();
+        console.log(data);*/
+        let data=[
+          {
+            id:1,
+            razonSocial:"SWISSJUST LATINOAMERICA S.A. SUCURSAL PERU",
+          },
+          {
+            id:2,
+            razonSocial:"DINET S.A.",
+          },
+        ];
+        if(true){//data.data.status=="success"
+          for(let i=0;i<data.length;i++){
+            this.opcionesClientes.push({
+              value:data[i].id,
+              label:data[i].razonSocial,
+            });
+          }
+        }
+      }catch(err){
+        console.log(err);
+      }
+    },
+  },
+  async created(){
+    await this.obtenerDepartamentos();
+    await this.obtenerClientes();
   }
 }
 </script>
