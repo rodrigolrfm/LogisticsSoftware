@@ -160,3 +160,10 @@ export function getProveedores(){
 
     });
 }
+
+export function getLogin(usuario,contrasena){
+    return axios.post(URL+"/general/login",{
+        "nombreUsuario":usuario,
+        "password":contrasena,
+    });
+}

@@ -1,5 +1,42 @@
 <template>
-  <a-card :style="{  background: '#fff', minHeight: '360px' }">
+  <a-layout style="min-height: 100vh">
+    <a-layout-sider theme="light" >
+      <div>
+        <a-image width="100%" src="logos/Andes_express.png" :preview="false"/>
+      </div>
+      <a-menu
+          v-model:selectedKeys="selectedKeys"
+          v-model:openKeys="openKeys"
+          mode="inline"
+      >
+        <a-sub-menu key="sub1">
+          <template #title>
+            <span>
+              <home-outlined />
+              <span>Módulos</span>
+            </span>
+          </template>
+          <a-menu-item key="1">
+            <router-link
+                to="/incidentes"
+            >Dashboard
+            </router-link>
+          </a-menu-item>
+          <a-menu-item key="2">
+            <router-link to="/analysis">
+              Análisis
+            </router-link>
+          </a-menu-item>
+        </a-sub-menu>
+      </a-menu>
+    </a-layout-sider>
+    <a-layout>
+      <a-layout-header>
+        <a-card :bordered="false" title="Andes Express" />
+      </a-layout-header>
+      <a-layout-content>
+       
+        <a-card :style="{  background: '#fff', minHeight: '360px' }" v-if="valPantalla">
     <a-breadcrumb >
       <a-breadcrumb-item>
         <home-outlined />
@@ -42,8 +79,8 @@
         </a-select>
         </a-col>
         <a-col :span="5" style="margin-left: 2rem;" v-if="!datosLlenos">
-          Indicadores
-          <a-button style="color:#82868B;" @click="mostrarGraficos">
+          <p style="color:#FFFFFF"> _ </p>
+          <a-button style="background-color:#FF0000; color:#FFFFFF;margin-left: 10px;" @click="mostrarGraficos">
             Generar Indicadores
           </a-button>
         </a-col>
@@ -53,17 +90,16 @@
           <p class="donut-chart">Porcentaje de incidencias</p>
           <apexchart
               style="padding-top: 40px"
-              width="400"
-              
+              width="500"
               type="donut"
               :options="optionsDonut"
               :series="seriesDonut"
               @dataPointSelection="mostrarDatosTipoIncidencia"
           ></apexchart>
         </a-col>
-        <a-col :span="10">
+        <a-col>
           <p class="donut-chart">Proveedor</p>
-          <span><a-select
+          <span style="margin-left:100px"><a-select
             v-model:value="proveedor"
             placeholder="Proveedor"
             style="width: 200px"
@@ -71,11 +107,16 @@
             @change="cambioProveedor"
           >
           </a-select>
-          <a-input disabled :value="porcentajeProveedor" style="width: 5rem;"></a-input></span>
+          <a-input disabled :value="porcentajeProveedor" style="width: 5rem;margin-left: 10px;"></a-input></span>
         </a-col>
       </a-row>
     </a-breadcrumb>
-  </a-card>
+  </a-card>        
+        
+      </a-layout-content>
+    </a-layout>
+    </a-layout>
+
 </template>
 
 <script>
@@ -99,11 +140,19 @@ export default {
 
       datosLlenos:false,
       
+      valPantalla: false,
+
       opcionesProveedores:[],
       opcionesTipoIncidencia:{},
 
-      opcionesDepartamento:[],
-      opcionesClientes:[],
+      opcionesDepartamento:[{
+        value:1,
+        label:'Departamento'
+      }],
+      opcionesClientes:[{
+        value:1,
+        label:'Cliente'
+      }],
 
       mostrarGraficosIncidencia:false,
       porcentajeProveedor:"%",
@@ -147,19 +196,21 @@ export default {
         return ' - ';
       },
     async mostrarGraficos(){
-      this.departamentoTexto=this.obtenerNombreDepartamentoPorID(this.departamento);
-      this.clienteTexto=this.obtenerNombreClientePorID(this.cliente);
+      let depaTexto=this.obtenerNombreDepartamentoPorID(this.departamento);
+      let cliTexto=this.obtenerNombreClientePorID(this.cliente);
+      //this.departamentoTexto=this.obtenerNombreDepartamentoPorID(this.departamento);
+      //this.clienteTexto=this.obtenerNombreClientePorID(this.cliente);
       sessionStorage.setItem('clienteIncidenciaID',this.cliente);
       sessionStorage.setItem('departamentoIncidenciaID',this.departamento);
-      sessionStorage.setItem('clienteIncidenciaTexto',this.clienteTexto);
-      sessionStorage.setItem('departamentoIncidenciaTexto',this.departamentoTexto);
+      sessionStorage.setItem('clienteIncidenciaTexto',cliTexto);
+      sessionStorage.setItem('departamentoIncidenciaTexto',depaTexto);
       let clienteTextoAux='';
-      if(this.clienteTexto!=' - '){
-          clienteTextoAux=this.clienteTexto;
+      if(cliTexto!=' - '){
+          clienteTextoAux=cliTexto;
       }
       let departamentoTextoAux='';
-      if(this.departamentoTexto!=' - '){
-        departamentoTextoAux=this.departamentoTexto;
+      if(depaTexto!=' - '){
+        departamentoTextoAux=depaTexto;
       }
       let data= await getIncidenciasPorTipo(this.fechaInicio,this.fechaFin,clienteTextoAux,departamentoTextoAux);
       //let data=await getIncidenciasPorTipo(this.fechaInicio,this.fechaFin,this.clienteTexto,this.departamentoTexto);
@@ -203,13 +254,18 @@ export default {
   async created(){
     this.fechaInicio=sessionStorage.fechaInicioIncidencia;
     this.fechaFin=sessionStorage.fechaFinIncidencia;
-    this.cliente=sessionStorage.clienteIncidenciaID;
-    this.departamento=sessionStorage.departamentoIncidenciaID;
+    //this.cliente=sessionStorage.clienteIncidenciaID;
+    //this.departamento=sessionStorage.departamentoIncidenciaID;
     this.clienteTexto=sessionStorage.clienteIncidenciaTexto;
     this.departamentoTexto=sessionStorage.departamentoIncidenciaTexto;
     this.opcionesClientes=JSON.parse(sessionStorage.opcionesClientes);
     this.opcionesDepartamento=JSON.parse(sessionStorage.opcionesDepartamentos);
     this.datosLlenos= (this.clienteTexto!= ' - ' && this.departamentoTexto != ' - ') ? true : false;
+    //this.cliente=sessionStorage.clienteIncidenciaID;
+    //this.departamento=sessionStorage.departamentoIncidenciaID;
+    setTimeout(()=>{
+      this.valPantalla=true;
+    },1000);
 
     try{
       let data2=await getProveedores();
@@ -279,7 +335,9 @@ export default {
   padding-top: 60px;
   font-weight: 600;
   text-align: center;
-  margin-right: 80px;
+  margin-left: 0px;
+  font-size: 24px;
+  text-decoration: underline;
 }
 .bar-chart {
   padding-top: 60px;

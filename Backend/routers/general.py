@@ -247,7 +247,7 @@ async def obtenerSolicitudUnica(solicitudUnica:SolicitudUnica):
 async def obtenerListaSolicitud(solicitudListarIncidentesIN:SolicitudListarIncidentesIN):
     return obtenerListaSolicitudModule(solicitudListarIncidentesIN)
 
-@router.post("/loguin/")
+@router.post("/login/")
 async def iniciarSesion(usuarioIniciarSesionIN:UsuarioIniciarSesionIN):
     return loguearse(usuarioIniciarSesionIN)
 
