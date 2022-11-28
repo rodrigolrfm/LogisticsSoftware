@@ -32,7 +32,11 @@
     </a-layout-sider>
     <a-layout>
       <a-layout-header>
-        <a-card :bordered="false" title="Andes Express" />
+        <a-space size="9000">
+            <a-card style="width: 550%;" :bordered="false" title="Andes Express" />
+            <p>:Administ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::.________________________________________________</p>
+            <a-card style="width: 150%;" :bordered="false" title="Administrador" />
+        </a-space>
       </a-layout-header>
       <a-layout-content>
        
