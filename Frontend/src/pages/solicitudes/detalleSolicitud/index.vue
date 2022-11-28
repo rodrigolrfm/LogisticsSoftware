@@ -2,7 +2,7 @@
   <a-layout style="min-height: 100vh">
     <a-layout-sider theme="light" >
       <div>
-        <a-image width="100%" src="logos/Andes_express.png" :preview="false"/>
+        <a-image width="100%" src="../logos/Andes_express.png" :preview="false"/>
       </div>
       <a-menu
           v-model:selectedKeys="selectedKeys"
@@ -282,13 +282,13 @@ export default {
 }
 
 .label{
-    margin-left: 25px;
+    margin-left: 15px;
     width: 10rem;
     height: 2rem;
 }
 .textField{
     margin-left: 10px;
-    width: 24rem;
+    width: 20rem;
     color:black;
 }
 .dashboard-title {

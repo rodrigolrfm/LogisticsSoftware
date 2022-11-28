@@ -80,7 +80,7 @@
         </a-col>
         <a-col :span="5" style="margin-left: 2rem;" v-if="!datosLlenos">
           <p style="color:#FFFFFF"> _ </p>
-          <a-button style="background-color:#FF0000; color:#FFFFFF;margin-left: 10px;" @click="mostrarGraficos">
+          <a-button style="background-color:#BF0909; color:#FFFFFF;margin-left: 10px;" @click="mostrarGraficos">
             Generar Indicadores
           </a-button>
         </a-col>
@@ -247,7 +247,7 @@ export default {
         porcentaje:11,
       }*/
       if(true){//data.data.status=="success"
-        this.porcentajeProveedor=data.data.porcentaje.toString()+"%";
+        this.porcentajeProveedor=(data.data.porcentaje*100).toString()+"%";
       }
     },
   },

@@ -2,7 +2,7 @@
   <a-layout style="min-height: 100vh">
     <a-layout-sider theme="light" >
       <div>
-        <a-image width="100%" src="logos/Andes_express.png" :preview="false"/>
+        <a-image width="100%" src="../../logos/Andes_express.png" :preview="false"/>
       </div>
       <a-menu
           v-model:selectedKeys="selectedKeys"

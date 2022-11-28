@@ -47,15 +47,15 @@
         <p class="dashboard-title">Dashboard</p>
         <a-row type="flex" justify="start" >
           <a-col :span="4">
-            Fecha inicio
+            <p>Fecha inicio</p>
             <a-date-picker placeholder="Fecha de inicio" format="DD/MM/YYYY" @change="cambioFechaInicio"/>
           </a-col>
           <a-col :span="4">
-            Fecha fin
+            <p>Fecha fin</p>
             <a-date-picker placeholder="Fecha de fin" format="DD/MM/YYYY" @change="cambioFechaFin"/>
           </a-col>
           <a-col :span="5">
-            Cliente
+            <p>Cliente</p>
             <a-select
                 v-model:value="cliente"
                 placeholder="Cliente"
@@ -65,7 +65,7 @@
             </a-select>
           </a-col>
           <a-col :span="4">
-            Departamento
+            <p> Departamento </p>
             <a-select
                 v-model:value="departamento"
                 placeholder="Departamento"
@@ -75,8 +75,8 @@
             </a-select>
           </a-col>
           <a-col :span="5" style="margin-left: 2rem;">
-            Indicadores
-            <a-button style="color:#82868B;" @click="mostrarGraficos">
+            <p style="color:#FFFFFF;"> _ </p>
+            <a-button style="background-color:#BF0909; color:#FFFFFF;" @click="mostrarGraficos">
               Generar Indicadores
             </a-button>
           </a-col>
@@ -135,11 +135,12 @@
         mostrarGrafico:false,
   
         optionsDonut: {
-          labels: ['No', 'Sí'],
+          labels: ['Sí', 'No'],
           plotOptions: {
             donut: {
               labels: {
                 show: true,
+                positon:'bottom'
               }
             }
           }
@@ -202,7 +203,7 @@
             diciembre:10,
           }*/
           if(true){//data.status=="success"
-            this.seriesDonut[0]=data.data.cantidadIncidencias-data.data.cantidadOK;
+            this.seriesDonut[0]=data.data.cantidadIncidencias;
             this.seriesDonut[1]=data.data.cantidadOK;
             this.seriesBar[0].data[0]=data1.data.enero;
             this.seriesBar[0].data[1]=data1.data.febrero;

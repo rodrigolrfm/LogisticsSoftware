@@ -119,12 +119,14 @@ def obtenerSolicitud(solicitud:SolicitudUnica):
 
 def listarCantidadIncidencias(filtro: ListarCantidadIncidenciasIn):
     filtro_dict = filtro.dict()
+    print(filtro_dict)
     fecha_inicio_str = "'" +  datetime.datetime.strptime(filtro_dict['fechaInicio'], "%d/%m/%Y").strftime("%Y-%m-%d") + "'" if filtro_dict['fechaInicio'] is not None else "NULL"
     fecha_fin_str = "'" +  datetime.datetime.strptime(filtro_dict['fechaFin'], "%d/%m/%Y").strftime("%Y-%m-%d") + "'" if filtro_dict['fechaFin'] is not None else "NULL" 
     cliente = "'" +  filtro_dict['cliente'] + "'" if filtro_dict['cliente'] is not None else "NULL"
     departamento = "'" +  filtro_dict['departamento'] + "'" if filtro_dict['departamento'] is not None else "NULL" 
     query_cantidades_text = QUERY_LISTAR_CANTIDAD_INCIDENCIAS.format(fecha_inicio = fecha_inicio_str, fecha_fin = fecha_fin_str, cliente = cliente,
                                                                         departamento = departamento)
+    print("diego brito" + query_cantidades_text)
     resultado = conn.execute(query_cantidades_text).fetchone()
     return ListarCantidadIncidenciasOut(cantidadIncidencias=resultado["cantidadIncidencias"] if resultado["cantidadIncidencias"] is not None else 0, 
                                         cantidadOK=resultado["cantidadOK"]if resultado["cantidadOK"] is not None else 0)

@@ -934,12 +934,12 @@ async def create_upload_file(file: UploadFile | None = None):
             
             fecha_manifiesto_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA_MANIFIESTO"]),'%d/%m/%Y')
             estado_manifiesto_r = dataResponse.loc[i,"ESTADO_MANIFIESTO"]
-            incidencia_manifiesto_r = None if (dataResponse.loc[i,"INCIDENCIA_MANIFIESTO"]=='') else dataResponse.loc[i,"INCIDENCIA_MANIFIESTO"]
+            incidencia_manifiesto_r = None if (str(dataResponse.loc[i,"INCIDENCIA_MANIFIESTO"]=='nan')) else dataResponse.loc[i,"INCIDENCIA_MANIFIESTO"]
             fecha_manifiesto_recogido_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA MANIFIESTO_RECOGIDO"]),'%d/%m/%Y')
             fecha_manifiesto_informado_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA MANIFIESTO_INFORMADO"]),'%d/%m/%Y')
             fecha_manifiesto_verificado_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA MANIFIESTO_VERIFICADO"]),'%d/%m/%Y')
             fecha_reparto_r = datetime.datetime.strptime(str(dataResponse.loc[i,"FECHA REPARTO"]),'%d/%m/%Y')
-            tipo_incidencia_reparto_r = dataResponse.loc[i,"TIPO_INCIDENCIA_REPARTO"]
+            tipo_incidencia_reparto_r =  None if (str(dataResponse.loc[i,"TIPO_INCIDENCIA_REPARTO"])=='nan') else dataResponse.loc[i,"TIPO_INCIDENCIA_REPARTO"]
             #print("++**")
             #print(type(dataResponse.loc[i,"FECHA_INCIDENCIA_REPARTO"]))
             #print(dataResponse.loc[i,"FECHA_INCIDENCIA_REPARTO"])
