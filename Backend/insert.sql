@@ -8,18 +8,26 @@ INSERT INTO Departamento (id, nombreDepartamento) VALUES ('2', 'LA LIBERTAD');
 INSERT INTO Departamento (id, nombreDepartamento) VALUES ('3', 'JUNIN');
 INSERT INTO Departamento (id, nombreDepartamento) VALUES ('4', 'UCAYALI');
 INSERT INTO Departamento (id, nombreDepartamento) VALUES ('5', 'SAN MARTIN');
+INSERT INTO Departamento (id, nombreDepartamento) VALUES ('6', 'LIMA');
+INSERT INTO Departamento (id, nombreDepartamento) VALUES ('7', 'AMAZONAS');
 
 INSERT INTO Provincia (id, nombreProvincia, idDepartamento) VALUES ('1', 'JAEN', '1');
 INSERT INTO Provincia (id, nombreProvincia, idDepartamento) VALUES ('2', 'TRUJILLO', '2');
 INSERT INTO Provincia (id, nombreProvincia, idDepartamento) VALUES ('3', 'HUANCAYO', '3');
 INSERT INTO Provincia (id, nombreProvincia, idDepartamento) VALUES ('4', 'CORONEL PORTILLO', '4');
 INSERT INTO Provincia (id, nombreProvincia, idDepartamento) VALUES ('5', 'TOCACHE', '5');
+INSERT INTO Provincia (id, nombreProvincia, idDepartamento) VALUES ('6', 'LIMA', '6');
+INSERT INTO Provincia (id, nombreProvincia, idDepartamento) VALUES ('7', 'UTCUBAMBA', '7');
 
 INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('1', 'JAEN', '1');
 INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('2', 'TRUJILLO', '2');
 INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('3', 'HUANCAYO', '3');
 INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('4', 'CALLERIA', '4');
 INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('5', 'UCHIZA', '5');
+INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('6', 'LIMA', '6');
+INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('7', 'HUACHIPA', '6');
+INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('8', 'EL TAMBO', '3');
+INSERT INTO Distrito (id, nombreDistrito, idProvincia) VALUES ('9', 'BAGUA GRANDE', '7');
 
 INSERT INTO Proveedor (id, razonSocial, idDistrito) VALUES ('1', 'MOVIL BUS S.A.C', '1');
 INSERT INTO Proveedor (id, razonSocial, idDistrito) VALUES ('2', 'ANDES EXPRESS S.A.C.', '2');
